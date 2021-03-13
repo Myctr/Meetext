@@ -1,29 +1,29 @@
 import React from "react";
 import { navbarStyles } from "../Styles/ComponentsStyle";
-const Navbar = () => {
-  const { background, logosrc, button } = navbarStyles;
+const Navbar = (props) => {
+  const { background, logosrc, button, profileCard } = navbarStyles;
   return (
     <nav className="navbar navbar-light bg-light" style={background}>
       <div className="container-fluid">
         <button type="button" className="btn btn-sm">
           <img src={logosrc} alt="Meetext" />
         </button>
-        {/* <div className="d-flex">
-          <button
-            className="btn btn-light me-3 btn-lg"
-            type="button"
-            style={button}
-          >
-            Hakkımızda
-          </button>
+        <div
+          className="d-flex"
+          style={
+            props.login ? { visibility: "visible" } : { visibility: "hidden" }
+          }
+        >
+          <div style={profileCard}>Muhammed Yasin</div>
           <button
             className="btn btn-light  me-2 btn-lg "
-            type="button"
             style={button}
+            type="button"
+            onClick={props.signOut}
           >
-            İletişim
+            Çıkış Yap
           </button>
-        </div> */}
+        </div>
       </div>
     </nav>
   );

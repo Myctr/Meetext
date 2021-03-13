@@ -1,7 +1,7 @@
 import React from "react";
 import { loginFormStyles } from "../Styles/ComponentsStyle";
 
-const LoginForm = () => {
+const LoginForm = (props) => {
   const {
     container,
     intro,
@@ -24,7 +24,15 @@ const LoginForm = () => {
         </div>
         <a style={register}>Kayıt olmak için tıklayınız!</a>
 
-        <button type="submit" style={button} className="btn btn-danger">
+        <button
+          style={button}
+          type="submit"
+          onClick={(e) => {
+            e.preventDefault();
+            props.signIn();
+          }}
+          className="btn btn-danger"
+        >
           Giriş
         </button>
       </form>

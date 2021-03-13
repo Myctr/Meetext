@@ -22,11 +22,17 @@ export const navbarStyles = {
   button: {
     borderRadius: 5,
     borderColor: "white",
-    margin: 5,
+    padding: 10,
+    marginLeft: 5,
     backgroundColor: "#F82249",
     fontSize: 15,
     color: "white",
-    padding: 20,
+  },
+  profileCard: {
+    padding: 10,
+    backgroundColor: "#E6E6E6",
+    borderRadius: 5,
+    borderColor: "white",
   },
 };
 export const loginFormStyles = {
