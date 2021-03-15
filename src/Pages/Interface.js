@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
+import Menu from "../Components/Menu";
+import Panel from "../Components/Panel";
 import styles from "../Styles/InterfaceStyle";
+
 const Interface = () => {
-  const { menu, panel } = styles;
+  const [activeMenu, setActiveMenu] = useState("create");
+
+  const { container, menu, panel } = styles;
   return (
-    <div>
-      <div style={menu}>Menü</div>
-      <div style={panel}>Panel</div>
+    <div style={container}>
+      <Menu style={menu} active={activeMenu} setActive={setActiveMenu} />
+      <Panel style={panel} />
     </div>
   );
 };

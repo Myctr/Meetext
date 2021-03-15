@@ -7,10 +7,9 @@ import styles from "./Styles/MainStyle";
 
 function App() {
   const { background, page } = styles;
-  const [login, setLogin] = useState(true);
+  const [login, setLogin] = useState(false);
   const loginHandler = () => {
     login ? setLogin(false) : setLogin(true);
-    console.log(login);
   };
   return (
     <div style={background}>

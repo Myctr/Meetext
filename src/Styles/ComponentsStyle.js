@@ -90,3 +90,17 @@ export const aboutStyles = {
     fontSize: 20,
   },
 };
+export const menuStyles = {
+  buttons: {
+    width: "100%",
+    height: "20%",
+    marginBottom: 5,
+  },
+  activeButton: {
+    width: "100%",
+    height: "20%",
+    marginBottom: 5,
+    backgroundColor: "#E6E6E6",
+    color: "black",
+  },
+};
