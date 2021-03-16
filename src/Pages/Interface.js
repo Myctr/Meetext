@@ -6,11 +6,13 @@ import styles from "../Styles/InterfaceStyle";
 const Interface = () => {
   const [activeMenu, setActiveMenu] = useState("create");
 
-  const { container, menu, panel } = styles;
+  const { row, container, menu, panel } = styles;
   return (
-    <div style={container}>
+    <div className="container" style={container}>
       <Menu style={menu} active={activeMenu} setActive={setActiveMenu} />
-      <Panel style={panel} />
+      <div className="row" style={row}>
+        <Panel style={panel} active={activeMenu} />
+      </div>
     </div>
   );
 };

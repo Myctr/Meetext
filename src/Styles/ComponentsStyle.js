@@ -92,15 +92,12 @@ export const aboutStyles = {
 };
 export const menuStyles = {
   buttons: {
-    width: "100%",
-    height: "20%",
-    marginBottom: 5,
+    margin: 10,
   },
   activeButton: {
-    width: "100%",
-    height: "20%",
-    marginBottom: 5,
+    margin: 10,
     backgroundColor: "#E6E6E6",
     color: "black",
   },
 };
+export const createStyles = {};
