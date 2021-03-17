@@ -2,6 +2,7 @@ import React from "react";
 import Create from "../Components/Create";
 import Join from "../Components/Join";
 import History from "../Components/History";
+
 const Panel = (props) => {
   return (
     <div style={props.style} className="col-12">

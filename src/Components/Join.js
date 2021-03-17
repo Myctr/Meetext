@@ -1,7 +1,11 @@
 import React from "react";
-
+import JoinSvg from "../Assets/Illustrates/JoinSvg";
 const Join = () => {
-  return <div>Join</div>;
+  return (
+    <div style={{ textAlign: "center" }}>
+      <JoinSvg />
+    </div>
+  );
 };
 
 export default Join;

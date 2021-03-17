@@ -1,8 +1,14 @@
 import React from "react";
 import { createStyles } from "../Styles/ComponentsStyle";
+import CreateSvg from "../Assets/Illustrates/CreateSvg";
 const Create = () => {
   return (
-    <div style={{ textAlign: "center" }}>
+    <div
+      style={{
+        textAlign: "center",
+      }}
+    >
+      <CreateSvg />
       <form style={{ margin: 50 }}>
         <input
           type="text"
@@ -11,9 +17,9 @@ const Create = () => {
             width: 300,
             height: 40,
             borderRadius: 5,
-            borderColor: "white",
+            borderColor: "#E6E6E6",
             margin: 5,
-            backgroundColor: "#E6E6E6",
+            backgroundColor: "white",
           }}
           required
         />
@@ -25,9 +31,9 @@ const Create = () => {
             width: 300,
             height: 40,
             borderRadius: 5,
-            borderColor: "white",
+            borderColor: "#E6E6E6",
             margin: 5,
-            backgroundColor: "#E6E6E6",
+            backgroundColor: "white",
           }}
           required
         />
