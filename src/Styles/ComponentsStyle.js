@@ -100,4 +100,65 @@ export const menuStyles = {
     color: "black",
   },
 };
-export const createStyles = {};
+export const createStyles = {
+  container: { textAlign: "center" },
+  form: {
+    margin: 50,
+  },
+  inputs: {
+    width: 300,
+    height: 40,
+    borderRadius: 5,
+    borderColor: "#E6E6E6",
+    margin: 5,
+    backgroundColor: "white",
+  },
+  button: {
+    width: 100,
+    height: 40,
+    borderRadius: 5,
+    borderColor: "white",
+    margin: 5,
+    backgroundColor: "#F82249",
+    fontSize: 15,
+  },
+};
+export const joinStyles = {
+  container: { textAlign: "center" },
+  form: {
+    margin: 50,
+  },
+  inputs: {
+    width: 300,
+    height: 40,
+    borderRadius: 5,
+    borderColor: "#E6E6E6",
+    margin: 5,
+    backgroundColor: "white",
+  },
+  button: {
+    width: 100,
+    height: 40,
+    borderRadius: 5,
+    borderColor: "white",
+    margin: 5,
+    backgroundColor: "#F82249",
+    fontSize: 15,
+  },
+};
+export const historyStyles = {
+  container: { padding: 30 },
+  card: {
+    backgroundColor: "#F82249",
+    height: 150,
+    border: "1px solid",
+    borderColor: "#E6E6E6",
+    borderRadius: 10,
+    textAlign: "center",
+    padding: 10,
+    margin: 20,
+  },
+  header: { margin: 5, color: "white", fontSize: 24 },
+  date: { margin: 5, color: "white" },
+  button: { width: "50%" },
+};
