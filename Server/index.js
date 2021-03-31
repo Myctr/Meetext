@@ -72,3 +72,13 @@ app.get('/tbl_rooms/:conn_id&:password',(req,res)=>{
     }
     catch(err){console.log(err)}
 })
+
+//Show Message TBL_MESSAGES
+app.get('/tbl_messages/:room_id',(req,res)=>{
+    mysqlConnection.query('SELECT * FROM tbl_messages WHERE room_id=?'  ,[req.params.room_id],(err,rows,fields)=>{
+        if (!err)
+            res.send(rows);
+        else
+            console.log(err);
+    })
+})

@@ -6,6 +6,7 @@ import Interface from "./Pages/Interface";
 import styles from "./Styles/MainStyle";
 
 function App() {
+  const [user,setUser] = useState();
   const { background, page } = styles;
   const [login, setLogin] = useState(false);
   const loginHandler = () => {
@@ -13,9 +14,9 @@ function App() {
   };
   return (
     <div style={background}>
-      <Navbar login={login} signOut={loginHandler} />
+      <Navbar login={login} user={user} signOut={loginHandler} />
       <div style={page}>
-        {login ? <Interface /> : <Login signIn={loginHandler} />}
+        {login ? <Interface user={user} /> : <Login signIn={loginHandler} setUser={setUser} />}
       </div>
       <div>
         <About />

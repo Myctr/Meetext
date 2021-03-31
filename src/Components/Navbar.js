@@ -14,7 +14,7 @@ const Navbar = (props) => {
             props.login ? { visibility: "visible" } : { visibility: "hidden" }
           }
         >
-          <div style={profileCard}>Muhammed Yasin</div>
+          <div style={profileCard}>{props.login ? props.user.name:'Undefined'}</div>
           <button
             className="btn btn-light  me-2 btn-lg "
             style={button}

@@ -1,7 +1,7 @@
 #Select Operations
 SELECT * FROM tbl_users;
 SELECT * FROM tbl_rooms;
-
+SELECT * FROM tbl_messages WHERE room_id=1;
 
 #Insert Operations
 INSERT INTO tbl_users (name,nickname,password,rooms) VALUES (?,?,?,?);

@@ -72,6 +72,10 @@ export const loginFormStyles = {
     padding: 10,
     fontSize: 15,
   },
+  error:{
+    padding:10,
+    margin:5
+  }
 };
 export const aboutStyles = {
   container: {
