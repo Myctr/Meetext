@@ -62,15 +62,55 @@ export const loginFormStyles = {
     fontSize: 15,
   },
   loss: {
-    color: "#E6E6E6",
+    color: "white",
     fontFamily: "calibri",
     padding: 10,
+    cursor:'pointer'
   },
   register: {
-    color: "#E6E6E6",
+    color: 'white',
     fontFamily: "calibri",
-    padding: 10,
+    padding: 5,
     fontSize: 15,
+    cursor:'pointer'
+  },
+  error:{
+    padding:10,
+    margin:5
+  }
+};
+export const registerFormStyles = {
+  container: { textAlign: "end", margin: "10%" },
+  intro: {
+    fontSize: 50,
+    marginRight: 70,
+    color: "white",
+    fontFamily: "calibri",
+  },
+  form: { alignItems: "center" },
+  input: {
+    width: 300,
+    height: 40,
+    borderRadius: 5,
+    borderColor: "white",
+    margin: 5,
+    backgroundColor: "#E6E6E6",
+  },
+  button: {
+    width: 100,
+    height: 40,
+    borderRadius: 5,
+    borderColor: "white",
+    margin: 5,
+    backgroundColor: "#F82249",
+    fontSize: 15,
+  },
+  login: {
+    color: "white",
+    fontFamily: "calibri",
+    padding: 5,
+    fontSize: 15,
+    cursor:'pointer'
   },
   error:{
     padding:10,

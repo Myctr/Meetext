@@ -21,7 +21,7 @@ mysqlConnection.connect((err) => {
 });
 
 
-app.listen(3000, () => console.log('Express server is runnig at port no : 3000'));
+app.listen(3001, () => console.log('Express server is runnig at port no : 3001'));
 
 
 //Sign in TBL_USERS
@@ -41,7 +41,7 @@ app.post('/tbl_users', (req, res) => {
         if (!err)
             res.send(rows);
         else
-            console.log(err);
+            console.log("Wrong");
     })
     }
     catch(err){console.log(err)}

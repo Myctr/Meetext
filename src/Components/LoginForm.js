@@ -8,21 +8,20 @@ const LoginForm = (props) => {
     form,
     input,
     button,
-    loss,
     register,
     error
   } = loginFormStyles;
 
-  const [username,setUsername] = useState();
-  const [password,setPassword] = useState();
-  const [errorMessage,setError] = useState();
+  const [username,setUsername] = useState("");
+  const [password,setPassword] = useState("");
+  const [errorMessage,setError] = useState("");
 
 
   const signInHandler = async () => {
     if(username!=="" & password!==""){
       await axios({
       method: 'get',
-      url: 'http://192.168.1.31:3001/tbl_users/'+username+'&'+password
+      url: 'http://meetextapi.myddns.me:1923/tbl_users/'+username+'&'+password
       })
     .then(res=>{
       console.log(res.data);
@@ -54,11 +53,8 @@ const LoginForm = (props) => {
             errorMessage
           }
         </div>
-        <div>
-          <a style={loss}>Şifremi unuttum!</a>
-        </div>
-        <a style={register}>Kayıt olmak için tıklayınız!</a>
-
+        <br />
+        <span style={register} onClick={()=>{props.form(false)}}>Kayıt olmak için tıklayınız!</span>
         <button
           style={button}
           type="submit"
