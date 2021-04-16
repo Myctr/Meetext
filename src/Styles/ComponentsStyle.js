@@ -65,19 +65,19 @@ export const loginFormStyles = {
     color: "white",
     fontFamily: "calibri",
     padding: 10,
-    cursor:'pointer'
+    cursor: "pointer",
   },
   register: {
-    color: 'white',
+    color: "white",
     fontFamily: "calibri",
     padding: 5,
     fontSize: 15,
-    cursor:'pointer'
+    cursor: "pointer",
   },
-  error:{
-    padding:10,
-    margin:5
-  }
+  error: {
+    padding: 10,
+    margin: 5,
+  },
 };
 export const registerFormStyles = {
   container: { textAlign: "end", margin: "10%" },
@@ -110,12 +110,12 @@ export const registerFormStyles = {
     fontFamily: "calibri",
     padding: 5,
     fontSize: 15,
-    cursor:'pointer'
+    cursor: "pointer",
   },
-  error:{
-    padding:10,
-    margin:5
-  }
+  error: {
+    padding: 10,
+    margin: 5,
+  },
 };
 export const aboutStyles = {
   container: {
@@ -165,6 +165,10 @@ export const createStyles = {
     margin: 5,
     backgroundColor: "#F82249",
     fontSize: 15,
+  },
+  error: {
+    padding: 10,
+    margin: 15,
   },
 };
 export const joinStyles = {
