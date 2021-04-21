@@ -27,11 +27,20 @@ const styles = {
     marginBottom: 15,
   },
   toolBox: {},
-  participant: {
+  participants: {
     border: "1px solid",
     marginTop: 30,
     marginBottom: 30,
+    backgroundColor: "#F82249",
+    padding: 10,
+  },
+  participant: {
     backgroundColor: "white",
+    height: "20%",
+    border: "1px solid",
+    borderRadius: 5,
+    textAlign: "center",
+    padding: 5,
   },
 };
 

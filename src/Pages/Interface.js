@@ -8,6 +8,12 @@ import Meet from "../Pages/Meet";
 
 const Interface = (props) => {
   const [activeMenu, setActiveMenu] = useState("create");
+  const [meet, setMeet] = useState({
+    name: "",
+    password: "",
+    admin_id: props.user.id,
+    conn_id: "",
+  });
 
   const { row, container, menu, panel } = styles;
   return (
@@ -19,13 +25,19 @@ const Interface = (props) => {
           {(() => {
             switch (activeMenu) {
               case "create":
-                return <Create setMeet={setActiveMenu} user={props.user} />;
+                return (
+                  <Create
+                    setActiveMenu={setActiveMenu}
+                    meet={meet}
+                    setMeet={setMeet}
+                  />
+                );
               case "join":
                 return <Join />;
               case "history":
                 return <History />;
               case "meet":
-                return <Meet />;
+                return <Meet meet={meet} />;
               default:
                 return <Create />;
             }
