@@ -9,6 +9,8 @@ INSERT INTO tbl_users (name,nickname,password,rooms) VALUES (?,?,?,?);
 INSERT INTO tbl_rooms (name,password,admin_id,conn_id) VALUES (?,?,?,?);
 
 #Update Operations
+UPDATE tbl_rooms SET participant='1' WHERE conn_id='d48b16e2-4611-456d-be4b-6868f913e548' and password='12345';
+
 
 #Delete Operations
 DELETE FROM tbl_users WHERE id=11;

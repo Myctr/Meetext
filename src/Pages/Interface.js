@@ -14,6 +14,10 @@ const Interface = (props) => {
     admin_id: props.user.id,
     conn_id: "",
   });
+  const [participant, setParticipant] = useState({
+    conn_id: "",
+    password: "",
+  });
 
   const { row, container, menu, panel } = styles;
   return (
@@ -33,7 +37,14 @@ const Interface = (props) => {
                   />
                 );
               case "join":
-                return <Join />;
+                return (
+                  <Join
+                    user={props.user}
+                    participant={participant}
+                    setParticipant={setParticipant}
+                    setActiveMenu={setActiveMenu}
+                  />
+                );
               case "history":
                 return <History />;
               case "meet":
