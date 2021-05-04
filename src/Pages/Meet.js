@@ -5,6 +5,7 @@ import axios from "axios";
 
 const Meet = (props) => {
   const [users, setUsers] = useState([]);
+  /*
   useEffect(() => {
     axios({
       method: "get",
@@ -16,6 +17,7 @@ const Meet = (props) => {
       }
     });
   }, []);
+  */
   const {
     header,
     chat,

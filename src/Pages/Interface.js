@@ -11,12 +11,9 @@ const Interface = (props) => {
   const [meet, setMeet] = useState({
     name: "",
     password: "",
-    admin_id: props.user.id,
+    admin_id: "",
     conn_id: "",
-  });
-  const [participant, setParticipant] = useState({
-    conn_id: "",
-    password: "",
+    participant: "",
   });
 
   const { row, container, menu, panel } = styles;
@@ -31,17 +28,18 @@ const Interface = (props) => {
               case "create":
                 return (
                   <Create
-                    setActiveMenu={setActiveMenu}
+                    user={props.user}
                     meet={meet}
                     setMeet={setMeet}
+                    setActiveMenu={setActiveMenu}
                   />
                 );
               case "join":
                 return (
                   <Join
                     user={props.user}
-                    participant={participant}
-                    setParticipant={setParticipant}
+                    meet={meet}
+                    setMeet={setMeet}
                     setActiveMenu={setActiveMenu}
                   />
                 );

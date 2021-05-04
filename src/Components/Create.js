@@ -8,6 +8,13 @@ const Create = (props) => {
   const [errorMessage, setError] = useState("");
   const [peer, setPeer] = useState();
   useEffect(() => {
+    props.setMeet({
+      name: "",
+      password: "",
+      admin_id: props.user.id,
+      conn_id: "",
+      participant: "",
+    });
     const P = new Peer();
     setPeer(P);
   }, []);
