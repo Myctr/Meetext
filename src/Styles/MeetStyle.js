@@ -3,7 +3,7 @@ const styles = {
   row: { height: "100%" },
   header: {
     textAlign: "center",
-    fontSize: 50,
+    fontSize: 25,
     fontFamily: "calibri",
   },
   chat: { border: "1px solid", margin: 30, backgroundColor: "white" },

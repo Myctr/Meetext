@@ -210,3 +210,42 @@ export const historyStyles = {
   date: { margin: 5, color: "white" },
   button: { width: "50%" },
 };
+
+export const welcomeStyles = {
+  container: { textAlign: "center", padding: 10 },
+  button: {
+    width: 200,
+    height: 80,
+    borderRadius: 5,
+    borderColor: "white",
+    margin: 5,
+    backgroundColor: "#F82249",
+    fontSize: 30,
+    marginTop: 30,
+  },
+  content: {
+    fontSize: 24,
+    margin: 20,
+    marginTop: 250,
+  },
+  header: { fontSize: 36, color: "#F82249", margin: 20, marginBottom: 15 },
+  logosrc: logo,
+};
+export const noteStyles = {
+  container: { padding: 10 },
+  header: {
+    fontSize: 36,
+    color: "#F82249",
+    margin: 20,
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  note: {
+    fontSize: 16,
+    margin: 5,
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: "white",
+    borderRadius: 5,
+  },
+};

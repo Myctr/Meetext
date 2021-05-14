@@ -1,6 +1,6 @@
 import React from "react";
 import { historyStyles } from "../Styles/ComponentsStyle";
-const History = () => {
+const History = (props) => {
   const { container, card, header, date, button } = historyStyles;
   return (
     <div className="container" style={container}>
@@ -8,7 +8,14 @@ const History = () => {
         <div className="col-2" style={card}>
           <div style={header}>Matematik</div>
           <div style={date}>18/03/2021</div>
-          <button className="btn btn-light" style={button}>
+          <button
+            className="btn btn-light"
+            style={button}
+            onClick={(e) => {
+              e.preventDefault();
+              props.setActive("note");
+            }}
+          >
             Notlar
           </button>
         </div>

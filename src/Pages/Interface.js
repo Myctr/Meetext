@@ -5,9 +5,11 @@ import Create from "../Components/Create";
 import Join from "../Components/Join";
 import History from "../Components/History";
 import Meet from "../Pages/Meet";
+import Welcome from "../Components/Welcome";
+import Note from "../Components/Note";
 
 const Interface = (props) => {
-  const [activeMenu, setActiveMenu] = useState("create");
+  const [activeMenu, setActiveMenu] = useState();
   const [meet, setMeet] = useState({
     name: "",
     password: "",
@@ -44,11 +46,13 @@ const Interface = (props) => {
                   />
                 );
               case "history":
-                return <History />;
+                return <History setActive={setActiveMenu} />;
+              case "note":
+                return <Note />;
               case "meet":
-                return <Meet meet={meet} />;
+                return <Meet user={props.user} meet={meet} setMeet={setMeet} />;
               default:
-                return <Create />;
+                return <Welcome setActive={setActiveMenu} />;
             }
           })()}
         </div>

@@ -32,7 +32,6 @@ const Create = (props) => {
           conn_id: peer.id,
         },
       }).then((res) => {
-        console.log(res.data);
         props.setActiveMenu("meet");
       });
     } else {

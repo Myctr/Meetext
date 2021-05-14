@@ -1,19 +1,50 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import MeetStyle from "../Styles/MeetStyle";
 import avatar from "../Assets/Image/avatar.png";
-import axios from "axios";
 
 const Meet = (props) => {
-  const [users, setUsers] = useState([]);
+  const [meetParticipants, setMeetParticipants] = useState([]);
+
+  const findName = (id) => {
+    axios({
+      method: "get",
+      url: "http://localhost:3001/tbl_users/" + id,
+    }).then((res) => {
+      setMeetParticipants([...meetParticipants, res.data[1]]);
+    });
+  };
+
+  useEffect(() => {
+    findName(props.meet.admin_id);
+    if (props.meet.participant) {
+      findName(props.meet.participant);
+    }
+  }, []);
+
   /*
+  const findName = async (id) => {
+    await axios({
+      method: "get",
+      url: "http://localhost:3001/tbl_users/" + id,
+    }).then((res) => {
+      setMeetParticipants([...meetParticipants, res.data[1]]);
+      console.log(meetParticipants);
+    });
+  };
   useEffect(() => {
     axios({
       method: "get",
-      url: "http://localhost:3001/tbl_users/" + props.meet.admin_id,
+      url:
+        "http://localhost:3001/tbl_rooms/" +
+        props.meet.conn_id +
+        "&" +
+        props.meet.password,
     }).then((res) => {
-      if (res.data === "notfound") {
-      } else {
-        setUsers([...users, res.data]);
+      props.setMeet(res.data);
+      findName(res.data.admin_id);
+      if (res.data.participant) {
+        findName(res.data.participant);
       }
     });
   }, []);
@@ -34,6 +65,7 @@ const Meet = (props) => {
   return (
     <div className="container" style={container}>
       <div style={header}>{props.meet.name}</div>
+      <div style={header}>Toplantı Id : {props.meet.conn_id}</div>
       <div className="row" style={row}>
         <div style={chat} className="col-9">
           <div style={chatBox}>chatBox</div>
@@ -45,18 +77,19 @@ const Meet = (props) => {
           </div>
         </div>
         <div style={participants} className="col-2">
-          {users.map((user) => (
-            <div key={user[0]}>
-              <div style={participant}>
+          <div>
+            {meetParticipants.map((user) => (
+              <div style={participant} key={user}>
                 <img
                   src={avatar}
                   alt="avatar"
                   style={{ width: "55%", height: "80%" }}
                 />
-                {user[1]}
+                <br />
+                {user}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
       <div style={toolBox}></div>
