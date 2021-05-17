@@ -11,7 +11,7 @@ const Create = (props) => {
     props.setMeet({
       name: "",
       password: "",
-      admin_id: props.user.id,
+      admin_id: props.user.name,
       conn_id: "",
       participant: "",
     });
@@ -28,7 +28,7 @@ const Create = (props) => {
         data: {
           name: props.meet.name,
           password: props.meet.password,
-          admin_id: props.meet.admin_id,
+          admin_id: props.user.id,
           conn_id: peer.id,
         },
       }).then((res) => {

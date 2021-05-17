@@ -7,10 +7,9 @@ const Join = (props) => {
   const { button, inputs, container, form } = joinStyles;
   const [errorMessage, setError] = useState("");
   const [peer, setPeer] = useState();
-
   const joinMeet = async () => {
+    /*
     if ((props.meet.conn_id !== "") & (props.meet.password !== "")) {
-      //hata burada
       await axios({
         method: "get",
         url:
@@ -20,10 +19,7 @@ const Join = (props) => {
           props.meet.password,
       }).then((res) => {
         console.log(res.data);
-        props.setMeet({ ...props.meet, name: res.data.name });
-        props.setMeet({ ...props.meet, admin_id: res.data.admin_id });
-        props.setMeet({ ...props.meet, participant: props.user.id });
-        console.log(props.meet);
+        props.setMeet(res.data);
         if (res.data === "Wrong") {
           setError("Toplantı id veya şifre hatalı!");
         } else {
@@ -43,7 +39,9 @@ const Join = (props) => {
     } else {
       setError("Toplantı adı veya toplantı şifresi alanı boş bırakılamaz!");
     }
+    */
   };
+
   return (
     <div style={container}>
       <JoinSvg />
