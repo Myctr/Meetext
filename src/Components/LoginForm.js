@@ -2,15 +2,8 @@ import React, { useState } from "react";
 import { loginFormStyles } from "../Styles/ComponentsStyle";
 import axios from "axios";
 const LoginForm = (props) => {
-  const {
-    container,
-    intro,
-    form,
-    input,
-    button,
-    register,
-    error,
-  } = loginFormStyles;
+  const { container, intro, form, input, button, register, error } =
+    loginFormStyles;
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -20,14 +13,16 @@ const LoginForm = (props) => {
     if ((username !== "") & (password !== "")) {
       await axios({
         method: "get",
-        url: "http://localhost:3001/tbl_users/" + username + "&" + password,
+        url:
+          "http://meetext.myddns.me:1923/signin/" + username + "&" + password,
       }).then((res) => {
         console.log(res.data);
-        if (res.data === "Wrong") {
+        if (res.data === false) {
           props.setUser(res.data);
           setError("Kullanıcı adı veya şifre hatalı!");
         } else {
           props.setUser(res.data);
+          alert("Giriş işlemi başarılı arayüze yönlendiriliyorsunuz..");
           props.signIn(true);
         }
       });

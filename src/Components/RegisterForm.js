@@ -3,15 +3,8 @@ import axios from "axios";
 import { registerFormStyles } from "../Styles/ComponentsStyle";
 
 const RegisterForm = (props) => {
-  const {
-    container,
-    intro,
-    form,
-    input,
-    button,
-    login,
-    error,
-  } = registerFormStyles;
+  const { container, intro, form, input, button, login, error } =
+    registerFormStyles;
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +13,7 @@ const RegisterForm = (props) => {
     if ((name !== "") & (username !== "") & (password !== "")) {
       await axios({
         method: "post",
-        url: "http://localhost:3001/tbl_users/",
+        url: "http://meetext.myddns.me:1923/signup",
         data: {
           name: name,
           nickname: username,
@@ -28,12 +21,12 @@ const RegisterForm = (props) => {
           rooms: "[]",
         },
       }).then((res) => {
-        console.log(res.data);
-        if (res.data === "Wrong") {
-          props.setUser(res.data);
+        if (res.data === false) {
           setMessage("Kayıt olmak istediğiniz kullanıcı adı zaten mevcut.");
         } else {
-          setMessage(true);
+          props.setUser(res.data[0]);
+          alert("Kayıt işlemi başarılı arayüze yönlendiriliyorsunuz..");
+          props.signIn(true);
         }
       });
     } else {
@@ -72,7 +65,7 @@ const RegisterForm = (props) => {
           className={message === true ? "badge bg-success" : "badge bg-danger"}
           style={error}
         >
-          {message === true ? "Kayıt işlemi başarılı" : message}
+          {message}
         </div>
         <br />
         <span style={login} onClick={() => props.form(true)}>

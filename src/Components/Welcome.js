@@ -22,8 +22,8 @@ const Welcome = (props) => {
       </div>
       <div style={content}>
         Meetext üzerinden çevrimiçi videokonferanslara oluşturabilir veya
-        katılabilirsiniz.Videokonferans sırasında yazarak veya sesli olarak
-        notlar oluşturabilir ve bu notlara istediğiniz zaman erişebilirsiniz.
+        katılabilirsiniz.Videokonferans sırasında yazılı veya sesli notlar
+        oluşturabilir ve bu notlara istediğiniz zaman erişebilirsiniz.
       </div>
     </div>
   );

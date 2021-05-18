@@ -13,8 +13,8 @@ const Participants = (props) => {
             alt="avatar"
             style={{ width: "55%", height: "80%" }}
           />
-          {props.meetParticipants[0]}
           <br />
+          {props.meetParticipants[0]}
         </div>
         <br />
         {props.meetParticipants[1] ? (
