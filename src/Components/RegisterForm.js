@@ -13,12 +13,12 @@ const RegisterForm = (props) => {
     if ((name !== "") & (username !== "") & (password !== "")) {
       await axios({
         method: "post",
-        url: "http://meetext.myddns.me:1923/signup",
+        url: "http://localhost:3001/signup",
         data: {
           name: name,
           nickname: username,
           password: password,
-          rooms: "[]",
+          rooms: "",
         },
       }).then((res) => {
         if (res.data === false) {

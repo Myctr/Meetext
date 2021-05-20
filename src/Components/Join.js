@@ -8,38 +8,29 @@ const Join = (props) => {
   const [errorMessage, setError] = useState("");
   const [peer, setPeer] = useState();
   const joinMeet = async () => {
-    /*
     if ((props.meet.conn_id !== "") & (props.meet.password !== "")) {
       await axios({
-        method: "get",
-        url:
-          "http://localhost:3001/tbl_rooms/" +
-          props.meet.conn_id +
-          "&" +
-          props.meet.password,
+        method: "post",
+        url: "http://localhost:3001/joinroom/",
+        data: {
+          participant: props.user.id,
+          conn_id: props.meet.conn_id,
+          password: props.meet.password,
+          conn_id: props.meet.conn_id,
+          password: props.meet.password,
+        },
       }).then((res) => {
-        console.log(res.data);
-        props.setMeet(res.data);
-        if (res.data === "Wrong") {
-          setError("Toplantı id veya şifre hatalı!");
+        if (res === false) {
+          setError("Toplantı id veya şifre yanlış!");
         } else {
-          axios({
-            method: "post",
-            url: "http://localhost:3001/tbl_rooms/",
-            data: {
-              participant: props.user.id,
-              conn_id: props.meet.conn_id,
-              password: props.meet.password,
-            },
-          }).then((res) => {
-            props.setActiveMenu("meet");
-          });
+          props.setMeet(res.data);
+          console.log(res.data);
+          props.setActiveMenu("meet");
         }
       });
     } else {
-      setError("Toplantı adı veya toplantı şifresi alanı boş bırakılamaz!");
+      setError("Toplantı id ve şifre alanları boş bırakılamaz!");
     }
-    */
   };
 
   return (

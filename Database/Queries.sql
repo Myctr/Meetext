@@ -24,3 +24,7 @@ UPDATE tbl_rooms SET participant='2' WHERE conn_id='646a6d7c-b3f6-49c5-82a5-5a09
 SELECT name FROM tbl_rooms where participant=2;
 SELECT * FROM tbl_users WHERE nickname='test216';
 UPDATE tbl_rooms SET participant='1' WHERE conn_id='646a6d7c-b3f6-49c5-82a5-5a098053fbda' and password='test';
+UPDATE tbl_users set rooms=1 where id=50;
+
+INSERT INTO tbl_users (name,nickname,password,rooms) VALUES ('ahmet','ahmt2','ahmt123','');
+SELECT * FROM tbl_rooms where id='';

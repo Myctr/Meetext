@@ -8,30 +8,24 @@ const Create = (props) => {
   const [errorMessage, setError] = useState("");
   const [peer, setPeer] = useState();
   useEffect(() => {
-    props.setMeet({
-      name: "",
-      password: "",
-      admin_id: props.user.name,
-      conn_id: "",
-      participant: "",
-    });
     const P = new Peer();
     setPeer(P);
   }, []);
 
   const createMeet = async () => {
     if ((props.meet.name !== "") & (props.meet.password !== "")) {
-      props.setMeet({ ...props.meet, conn_id: peer.id });
       await axios({
         method: "post",
-        url: "http://localhost:3001/tbl_rooms/",
+        url: "http://localhost:3001/createroom/",
         data: {
           name: props.meet.name,
           password: props.meet.password,
           admin_id: props.user.id,
           conn_id: peer.id,
+          userid: props.user.id,
         },
       }).then((res) => {
+        props.setMeet(res.data);
         props.setActiveMenu("meet");
       });
     } else {

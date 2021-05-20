@@ -13,8 +13,7 @@ const LoginForm = (props) => {
     if ((username !== "") & (password !== "")) {
       await axios({
         method: "get",
-        url:
-          "http://meetext.myddns.me:1923/signin/" + username + "&" + password,
+        url: "http://localhost:3001/signin/" + username + "&" + password,
       }).then((res) => {
         console.log(res.data);
         if (res.data === false) {

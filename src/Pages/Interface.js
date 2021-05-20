@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Menu from "../Components/Menu";
 import styles from "../Styles/InterfaceStyle";
 import Create from "../Components/Create";
@@ -11,13 +12,28 @@ import Note from "../Components/Note";
 const Interface = (props) => {
   const [activeMenu, setActiveMenu] = useState();
   const [meet, setMeet] = useState({
+    id: "",
     name: "",
     password: "",
     admin_id: "",
     conn_id: "",
     participant: "",
   });
-
+  const [history, setHistory] = useState();
+  const [messageIndex, setMessageIndex] = useState();
+  useEffect(() => {
+    axios({
+      method: "get",
+      url:
+        "http://localhost:3001/showroms/" +
+        props.user.nickname +
+        "&" +
+        props.user.password,
+    }).then((res) => {
+      setHistory(res.data);
+      console.log(res.data);
+    });
+  }, []);
   const { row, container, menu, panel } = styles;
   return (
     <div className="container" style={container}>
@@ -46,9 +62,16 @@ const Interface = (props) => {
                   />
                 );
               case "history":
-                return <History setActive={setActiveMenu} />;
+                return (
+                  <History
+                    history={history}
+                    user={props.user}
+                    setMessageIndex={setMessageIndex}
+                    setActive={setActiveMenu}
+                  />
+                );
               case "note":
-                return <Note />;
+                return <Note user={props.user} messageIndex={messageIndex} />;
               case "meet":
                 return <Meet user={props.user} meet={meet} setMeet={setMeet} />;
               default:

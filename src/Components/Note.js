@@ -1,13 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { noteStyles } from "../Styles/ComponentsStyle";
 
-const Note = () => {
+const Note = (props) => {
+  const [messages, setMessages] = useState();
+  useEffect(() => {
+    console.log(props.messageIndex);
+    messageHandler();
+    console.log(messages);
+  }, []);
+  const messageHandler = async () => {
+    await axios({
+      method: "get",
+      url:
+        "http://localhost:3001/showmsg/" +
+        props.user.nickname +
+        "&" +
+        props.user.password +
+        "&" +
+        props.messageIndex,
+    }).then((res) => {
+      setMessages(res.data);
+    });
+  };
   const { container, header, note } = noteStyles;
   return (
     <div style={container}>
       <div style={header}>Matematik</div>
-      <div style={note}>{"Muhammed - "}Matematik dersi başlamıştır.</div>
-      <div style={note}>{"Yasin - "}Merhaba arkadaşlar.</div>
     </div>
   );
 };
