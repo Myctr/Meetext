@@ -45,7 +45,7 @@ function App() {
       <Navbar login={Boolean(user)} user={user} signOut={handleSignOut} />
       <main className="app-content">
         {user ? (
-          <Interface user={user} />
+          <Interface user={user} onUserUpdated={setUser} />
         ) : (
           <Login onAuthenticated={handleAuthenticated} />
         )}

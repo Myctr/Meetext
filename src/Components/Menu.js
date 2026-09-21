@@ -5,6 +5,7 @@ const Menu = (props) => {
     ["create", "Yeni toplantı"],
     ["join", "Toplantıya katıl"],
     ["history", "Toplantılarım"],
+    ["profile", "Profilim"],
   ];
 
   return (
@@ -13,7 +14,9 @@ const Menu = (props) => {
         <button
           key={value}
           type="button"
-          className={props.active === value ? "menu-button is-active" : "menu-button"}
+          className={
+            props.active === value ? "menu-button is-active" : "menu-button"
+          }
           onClick={() => props.setActive(value)}
         >
           {label}

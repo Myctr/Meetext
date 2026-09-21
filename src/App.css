@@ -370,6 +370,44 @@
   margin: 0 auto;
 }
 
+.profile-view {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.profile-form {
+  display: grid;
+  gap: 0.9rem;
+  max-width: 460px;
+  margin-top: 1.5rem;
+}
+
+.avatar-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--accent-dark);
+  cursor: pointer;
+}
+
+.avatar-picker img,
+.avatar-picker span {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(240, 79, 97, 0.12);
+  color: var(--accent-dark);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.5rem;
+  object-fit: cover;
+}
+
+.avatar-picker input {
+  display: none;
+}
+
 .meeting-room {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);

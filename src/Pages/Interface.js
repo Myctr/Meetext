@@ -7,6 +7,7 @@ import History from "../Components/History";
 import Meet from "../Pages/Meet";
 import Welcome from "../Components/Welcome";
 import Note from "../Components/Note";
+import Profile from "../Components/Profile";
 
 const Interface = (props) => {
   const [activeMenu, setActiveMenu] = useState();
@@ -68,6 +69,8 @@ const Interface = (props) => {
                 );
               case "note":
                 return <Note user={props.user} messageIndex={messageIndex} />;
+              case "profile":
+                return <Profile user={props.user} onUpdated={props.onUserUpdated} />;
               case "meet":
                 return (
                   <Meet

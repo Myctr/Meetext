@@ -222,6 +222,29 @@ app.post("/signout", requireSession, async (req, res) => {
   }
 });
 
+app.put("/profile", requireSession, async (req, res) => {
+  const { name, nickname, password, avatar } = req.body;
+  if (!name || !nickname) {
+    return res.status(400).send({ error: "name and nickname are required" });
+  }
+  if (avatar && (!avatar.startsWith("data:image/") || avatar.length > 700000)) {
+    return res.status(400).send({ error: "avatar must be a small image" });
+  }
+
+  try {
+    const passwordHash = password ? await bcrypt.hash(password, 12) : req.user.password;
+    await run(
+      "UPDATE tbl_users SET name = ?, nickname = ?, password = ?, avatar = ? WHERE id = ?",
+      [name, nickname, passwordHash, avatar || null, req.user.id],
+    );
+    const user = await get("SELECT * FROM tbl_users WHERE id = ?", [req.user.id]);
+    return res.send(publicUser(user));
+  } catch (error) {
+    if (error.code === "SQLITE_CONSTRAINT") return res.status(409).send(false);
+    return sendDatabaseError(res, error);
+  }
+});
+
 app.post("/createroom", requireSession, createRoom);
 app.post("/joinroom", requireSession, joinRoom);
 app.get("/showroms", requireSession, showRooms);
