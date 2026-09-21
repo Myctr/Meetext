@@ -252,6 +252,7 @@
 }
 
 .workspace-panel-inner {
+  height: 100%;
   min-height: 100%;
   box-sizing: border-box;
   padding: clamp(1.25rem, 4vw, 3rem);
@@ -357,8 +358,10 @@
 
 .meeting-room {
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 1.5rem;
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
 }
 
 .meeting-room-header {
@@ -369,6 +372,9 @@
 }
 
 .meeting-id {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   max-width: 260px;
   padding: 0.7rem 0.85rem;
   overflow-wrap: anywhere;
@@ -379,11 +385,34 @@
   font-size: 0.82rem;
 }
 
+.meeting-id span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.copy-button {
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 0 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.copy-button:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
 .meeting-room-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 190px;
   gap: 1rem;
-  min-height: 360px;
+  height: 100%;
+  min-height: 0;
 }
 
 .meeting-chat,
@@ -396,7 +425,8 @@
 
 .meeting-chat {
   display: grid;
-  grid-template-rows: minmax(240px, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
 }
 
 .meeting-chat-box {
@@ -404,6 +434,7 @@
   flex-direction: column;
   gap: 0.7rem;
   overflow-y: auto;
+  min-height: 0;
   padding: 1rem;
   color: var(--muted);
 }
@@ -465,6 +496,8 @@
 }
 
 .participants-panel {
+  min-height: 0;
+  overflow-y: auto;
   padding: 1rem;
 }
 
@@ -563,6 +596,7 @@
 
   .meeting-room-grid {
     grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
   }
 
   .participants-panel {

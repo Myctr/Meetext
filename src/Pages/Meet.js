@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import Participants from "../Components/Participants";
 
 const Meet = ({ meet, meetingPeer, user }) => {
@@ -8,6 +9,7 @@ const Meet = ({ meet, meetingPeer, user }) => {
     { id: user.id, name: user.name },
   ]);
   const [messageText, setMessageText] = useState("");
+  const [copied, setCopied] = useState(false);
   const connectionRef = useRef(null);
   const isHost = String(meet.admin_id) === String(user.id);
 
@@ -98,6 +100,17 @@ const Meet = ({ meet, meetingPeer, user }) => {
     setMessageText("");
   };
 
+  const copyMeetingId = async () => {
+    try {
+      await navigator.clipboard.writeText(meet.conn_id);
+      setCopied(true);
+      toast.success("Toplantı ID'si kopyalandı.");
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch (error) {
+      toast.error("Toplantı ID'si kopyalanamadı.");
+    }
+  };
+
   return (
     <div className="meeting-room">
       <div className="meeting-room-header">
@@ -106,7 +119,12 @@ const Meet = ({ meet, meetingPeer, user }) => {
           <h1 className="panel-title">{meet.name}</h1>
           <p className="meeting-status">{connectionStatus}</p>
         </div>
-        <div className="meeting-id">ID: {meet.conn_id}</div>
+        <div className="meeting-id">
+          <span>ID: {meet.conn_id}</span>
+          <button className="copy-button" type="button" onClick={copyMeetingId}>
+            {copied ? "Kopyalandı" : "Kopyala"}
+          </button>
+        </div>
       </div>
       <div className="meeting-room-grid">
         <div className="meeting-chat">
