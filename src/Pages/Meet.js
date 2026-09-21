@@ -1,44 +1,33 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import MeetStyle from "../Styles/MeetStyle";
+import React from "react";
 import Participants from "../Components/Participants";
 
 const Meet = (props) => {
-  const [meetParticipants, setMeetParticipants] = useState([
+  const meetParticipants = [
     props.meet.admin_id,
     props.meet.participant,
-  ]);
+  ];
 
-  const {
-    header,
-    chat,
-    messageBox,
-    toolBox,
-    participants,
-    participant,
-    container,
-    row,
-    chatBox,
-    textBox,
-    button,
-  } = MeetStyle;
   return (
-    <div className="container" style={container}>
-      <div style={header}>{props.meet.name}</div>
-      <div style={header}>Toplantı Id : {props.meet.conn_id}</div>
-      <div className="row" style={row}>
-        <div style={chat} className="col-9">
-          <div style={chatBox}>chatBox</div>
-          <div style={messageBox}>
-            <input type="text" style={textBox}></input>
-            <button className="btn btn-light" style={button}>
+    <div className="meeting-room">
+      <div className="meeting-room-header">
+        <div>
+          <p className="auth-kicker">Canlı toplantı</p>
+          <h1 className="panel-title">{props.meet.name}</h1>
+        </div>
+        <div className="meeting-id">ID: {props.meet.conn_id}</div>
+      </div>
+      <div className="meeting-room-grid">
+        <div className="meeting-chat">
+          <div className="meeting-chat-box">Mesajlar burada görünecek.</div>
+          <div className="meeting-message-box">
+            <input type="text" className="field-input" placeholder="Mesaj yazın..." />
+            <button className="secondary-button" type="button">
               Gönder
             </button>
           </div>
         </div>
         <Participants meetParticipants={meetParticipants} />
       </div>
-      <div style={toolBox}></div>
     </div>
   );
 };

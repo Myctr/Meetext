@@ -1,19 +1,18 @@
-import React, { useState } from "react";
-import { historyStyles } from "../Styles/ComponentsStyle";
-import axios from "axios";
+import React from "react";
 const History = (props) => {
-  const { container, card, header, date, button } = historyStyles;
-
   return (
-    <div className="container" style={container}>
-      <div className="row">
-        {props.history.map((room) => (
-          <div className="col-2" style={card} key={room.id}>
-            <div style={header}>{room.name}</div>
-            {/* <div style={date}>18/03/2021</div> */}
+    <div>
+      <div className="section-heading">
+        <p className="auth-kicker">Geçmiş</p>
+        <h1 className="panel-title">Toplantılarım</h1>
+      </div>
+      <div className="history-grid">
+        {(props.history || []).map((room) => (
+          <div className="history-card" key={room.id}>
+            <h2 className="history-card-title">{room.name}</h2>
             <button
-              className="btn btn-light"
-              style={button}
+              className="secondary-button"
+              type="button"
               onClick={(e) => {
                 e.preventDefault();
                 props.setMessageIndex(room.id);

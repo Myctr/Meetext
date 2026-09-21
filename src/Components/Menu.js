@@ -1,40 +1,24 @@
 import React from "react";
-import { menuStyles } from "../Styles/ComponentsStyle";
 
 const Menu = (props) => {
-  const { activeButton, buttons } = menuStyles;
+  const items = [
+    ["create", "Yeni toplantı"],
+    ["join", "Toplantıya katıl"],
+    ["history", "Toplantılarım"],
+  ];
+
   return (
-    <div style={props.style}>
-      <button
-        type="button"
-        className="btn btn-danger"
-        style={props.active === "create" ? activeButton : buttons}
-        onClick={() => {
-          props.setActive("create");
-        }}
-      >
-        Toplantı Oluştur
-      </button>
-      <button
-        type="button"
-        className="btn btn-danger"
-        style={props.active === "join" ? activeButton : buttons}
-        onClick={() => {
-          props.setActive("join");
-        }}
-      >
-        Toplantıya Katıl
-      </button>
-      <button
-        type="button"
-        className="btn btn-danger"
-        style={props.active === "history" ? activeButton : buttons}
-        onClick={() => {
-          props.setActive("history");
-        }}
-      >
-        Toplantılarım
-      </button>
+    <div className="workspace-menu">
+      {items.map(([value, label]) => (
+        <button
+          key={value}
+          type="button"
+          className={props.active === value ? "menu-button is-active" : "menu-button"}
+          onClick={() => props.setActive(value)}
+        >
+          {label}
+        </button>
+      ))}
     </div>
   );
 };

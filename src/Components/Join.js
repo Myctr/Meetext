@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import JoinSvg from "../Assets/Illustrates/JoinSvg";
-import { joinStyles } from "../Styles/ComponentsStyle";
-import Peer from "peerjs";
 const Join = (props) => {
-  const { button, inputs, container, form } = joinStyles;
   const [errorMessage, setError] = useState("");
-  const [peer, setPeer] = useState();
   const joinMeet = async () => {
     if ((props.meet.conn_id !== "") & (props.meet.password !== "")) {
       await axios({
@@ -14,8 +10,6 @@ const Join = (props) => {
         url: "http://localhost:3001/joinroom/",
         data: {
           participant: props.user.id,
-          conn_id: props.meet.conn_id,
-          password: props.meet.password,
           conn_id: props.meet.conn_id,
           password: props.meet.password,
         },
@@ -34,13 +28,18 @@ const Join = (props) => {
   };
 
   return (
-    <div style={container}>
-      <JoinSvg />
-      <form style={form}>
+    <div className="meeting-form-view">
+      <div className="meeting-illustration"><JoinSvg /></div>
+      <div>
+        <p className="auth-kicker">Mevcut alan</p>
+        <h1 className="panel-title">Toplantıya katıl</h1>
+        <p className="panel-description">Toplantı kimliğini ve şifresini girerek görüşmeye devam edin.</p>
+      </div>
+      <form className="meeting-form">
         <input
           type="text"
           placeholder="Toplantı Id"
-          style={inputs}
+          className="field-input"
           onChange={(e) =>
             props.setMeet({
               ...props.meet,
@@ -53,7 +52,7 @@ const Join = (props) => {
         <input
           type="password"
           placeholder="Toplantı Şifresi"
-          style={inputs}
+          className="field-input"
           onChange={(e) =>
             props.setMeet({
               ...props.meet,
@@ -63,9 +62,9 @@ const Join = (props) => {
           required
         />
         <br />
+        <p className="inline-error" role="alert">{errorMessage}</p>
         <button
-          className="btn btn-danger"
-          style={button}
+          className="primary-button"
           onClick={(e) => {
             e.preventDefault();
             joinMeet();

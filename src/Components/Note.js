@@ -1,32 +1,11 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { noteStyles } from "../Styles/ComponentsStyle";
+import React from "react";
 
 const Note = (props) => {
-  const [messages, setMessages] = useState();
-  useEffect(() => {
-    console.log(props.messageIndex);
-    messageHandler();
-    console.log(messages);
-  }, []);
-  const messageHandler = async () => {
-    await axios({
-      method: "get",
-      url:
-        "http://localhost:3001/showmsg/" +
-        props.user.nickname +
-        "&" +
-        props.user.password +
-        "&" +
-        props.messageIndex,
-    }).then((res) => {
-      setMessages(res.data);
-    });
-  };
-  const { container, header, note } = noteStyles;
   return (
-    <div style={container}>
-      <div style={header}>Matematik</div>
+    <div className="note-view">
+      <p className="auth-kicker">Toplantı notları</p>
+      <h1 className="panel-title">Notlar</h1>
+      <p className="panel-description">Bu alan sonraki adımda toplantı mesajlarını ve notlarını gösterecek.</p>
     </div>
   );
 };

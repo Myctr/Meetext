@@ -1,26 +1,28 @@
 import React, { useState } from "react";
+import "./App.css";
 import Navbar from "./Components/Navbar";
-import About from "./Components/About";
 import Login from "./Pages/Login";
 import Interface from "./Pages/Interface";
-import styles from "./Styles/MainStyle";
+import { Toaster } from "react-hot-toast";
 
 function App() {
-  const [user,setUser] = useState();
-  const { background, page } = styles;
+  const [user, setUser] = useState();
   const [login, setLogin] = useState(false);
-  const loginHandler = () => {
-    login ? setLogin(false) : setLogin(true);
-  };
+  const loginHandler = () => setLogin((isLoggedIn) => !isLoggedIn);
+
   return (
-    <div style={background}>
+    <div className="app-shell">
       <Navbar login={login} user={user} signOut={loginHandler} />
-      <div style={page}>
+      <main className="app-content">
         {login ? <Interface user={user} /> : <Login signIn={loginHandler} setUser={setUser} />}
-      </div>
-      <div>
-        <About />
-      </div>
+      </main>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3500,
+          style: { borderRadius: "12px", fontFamily: "inherit" },
+        }}
+      />
     </div>
   );
 }

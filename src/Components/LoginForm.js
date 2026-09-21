@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-import { loginFormStyles } from "../Styles/ComponentsStyle";
 import axios from "axios";
+import toast from "react-hot-toast";
 const LoginForm = (props) => {
-  const { container, intro, form, input, button, register, error } =
-    loginFormStyles;
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setError] = useState("");
@@ -19,60 +16,57 @@ const LoginForm = (props) => {
         if (res.data === false) {
           props.setUser(res.data);
           setError("Kullanıcı adı veya şifre hatalı!");
+          toast.error("Kullanıcı adı veya şifre hatalı.");
         } else {
           props.setUser(res.data);
-          alert("Giriş işlemi başarılı arayüze yönlendiriliyorsunuz..");
+          toast.success("Giriş başarılı. Arayüze yönlendiriliyorsunuz.");
           props.signIn(true);
         }
       });
     } else {
       setError("Kullanıcı adı veya şifre alanı boş bırakılamaz!");
+      toast.error("Kullanıcı adı ve şifre gerekli.");
     }
   };
 
   return (
-    <div style={container}>
-      <div style={intro}>Giriş Yap</div>
-      <form style={form}>
-        <input
-          type="text"
-          style={input}
-          placeholder="Kullanıcı adı"
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        <br />
-        <input
-          type="password"
-          style={input}
-          placeholder="Şifre"
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <br />
-        <div className="badge bg-danger" style={error}>
-          {errorMessage}
-        </div>
-        <br />
-        <span
-          style={register}
-          onClick={() => {
-            props.form(false);
-          }}
-        >
-          Kayıt olmak için tıklayınız!
-        </span>
-        <button
-          style={button}
-          type="submit"
-          onClick={(e) => {
-            e.preventDefault();
-            signInHandler();
-          }}
-          className="btn btn-danger"
-        >
-          Giriş
+    <div>
+      <h2 className="form-title">Giriş yap</h2>
+      <p className="form-description">Toplantı alanınıza devam etmek için hesabınıza giriş yapın.</p>
+      <form className="auth-form">
+        <label className="field-label">
+          Kullanıcı adı
+          <input
+            className="field-input"
+            type="text"
+            placeholder="Kullanıcı adınız"
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </label>
+        <label className="field-label">
+          Şifre
+          <input
+            className="field-input"
+            type="password"
+            placeholder="Şifreniz"
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </label>
+        <p className="inline-error" role="alert">{errorMessage}</p>
+        <button className="primary-button" type="submit" onClick={(e) => {
+          e.preventDefault();
+          signInHandler();
+        }}>
+          Giriş yap
         </button>
+        <p className="form-switch">
+          Hesabınız yok mu?{" "}
+          <button className="text-button" type="button" onClick={() => props.form(false)}>
+            Kayıt olun
+          </button>
+        </p>
       </form>
     </div>
   );

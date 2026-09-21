@@ -1,30 +1,19 @@
 import React from "react";
-import { welcomeStyles } from "../Styles/ComponentsStyle";
 const Welcome = (props) => {
-  const { container, button, content, header } = welcomeStyles;
   return (
-    <div style={container}>
-      <div style={header}>
-        Meetext'e Hoşgeldiniz!
-        <br /> Videokonferans oluşturmak için lütfen tıklayınız.
-        <br />
-        <br />
-        <button
-          className="btn btn-danger"
-          style={button}
-          onClick={(e) => {
-            e.preventDefault();
-            props.setActive("create");
-          }}
-        >
-          Meetext
-        </button>
-      </div>
-      <div style={content}>
-        Meetext üzerinden çevrimiçi videokonferanslara oluşturabilir veya
-        katılabilirsiniz.Videokonferans sırasında yazılı veya sesli notlar
-        oluşturabilir ve bu notlara istediğiniz zaman erişebilirsiniz.
-      </div>
+    <div className="welcome-view">
+      <p className="auth-kicker">Meetext workspace</p>
+      <h1 className="welcome-title">Toplantı alanınız hazır.</h1>
+      <p className="welcome-copy">
+        Yeni bir toplantı oluşturun veya size gönderilen toplantı kimliğiyle mevcut bir görüşmeye katılın.
+      </p>
+      <button
+        className="primary-button welcome-button"
+        type="button"
+        onClick={() => props.setActive("create")}
+      >
+        Yeni toplantı oluştur
+      </button>
     </div>
   );
 };

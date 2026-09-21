@@ -1,38 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { participantsStyles } from "../Styles/ComponentsStyle";
+import React from "react";
 import avatar from "../Assets/Image/avatar.png";
 const Participants = (props) => {
-  const { participants, participant } = participantsStyles;
-
   return (
-    <div style={participants} className="col-2">
-      <div>
-        <div style={participant}>
-          <img
-            src={avatar}
-            alt="avatar"
-            style={{ width: "55%", height: "80%" }}
-          />
-          <br />
-          {props.meetParticipants[0]}
+    <aside className="participants-panel">
+      <h2 className="participants-title">Katılımcılar</h2>
+      {props.meetParticipants.map((participant, index) => participant && (
+        <div className="participant-card" key={`${participant}-${index}`}>
+          <img src={avatar} alt="" />
+          <span>{participant}</span>
         </div>
-        <br />
-        {props.meetParticipants[1] ? (
-          <div style={participant}>
-            <img
-              src={avatar}
-              alt="avatar"
-              style={{ width: "55%", height: "80%" }}
-            />
-
-            <br />
-            {props.meetParticipants[1]}
-          </div>
-        ) : (
-          <div></div>
-        )}
-      </div>
-    </div>
+      ))}
+    </aside>
   );
 };
 export default Participants;

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Menu from "../Components/Menu";
-import styles from "../Styles/InterfaceStyle";
 import Create from "../Components/Create";
 import Join from "../Components/Join";
 import History from "../Components/History";
@@ -33,14 +32,16 @@ const Interface = (props) => {
       setHistory(res.data);
       console.log(res.data);
     });
-  }, []);
-  const { row, container, menu, panel } = styles;
+  }, [props.user.nickname, props.user.password]);
+
   return (
-    <div className="container" style={container}>
-      <Menu style={menu} active={activeMenu} setActive={setActiveMenu} />
-      {}
-      <div className="row" style={row}>
-        <div style={panel}>
+    <div className="workspace">
+      <aside className="workspace-sidebar">
+        <div className="sidebar-label">Çalışma alanı</div>
+        <Menu active={activeMenu} setActive={setActiveMenu} />
+      </aside>
+      <section className="workspace-panel">
+        <div className="workspace-panel-inner">
           {(() => {
             switch (activeMenu) {
               case "create":
@@ -79,7 +80,7 @@ const Interface = (props) => {
             }
           })()}
         </div>
-      </div>
+      </section>
     </div>
   );
 };

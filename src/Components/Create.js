@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { createStyles } from "../Styles/ComponentsStyle";
 import CreateSvg from "../Assets/Illustrates/CreateSvg";
 import Peer from "peerjs";
 const Create = (props) => {
-  const { button, inputs, container, form, error } = createStyles;
   const [errorMessage, setError] = useState("");
   const [peer, setPeer] = useState();
   useEffect(() => {
@@ -33,13 +31,18 @@ const Create = (props) => {
     }
   };
   return (
-    <div style={container}>
-      <CreateSvg />
-      <form style={form}>
+    <div className="meeting-form-view">
+      <div className="meeting-illustration"><CreateSvg /></div>
+      <div>
+        <p className="auth-kicker">Yeni alan</p>
+        <h1 className="panel-title">Toplantı oluştur</h1>
+        <p className="panel-description">Katılımcılarınızla paylaşabileceğiniz yeni bir PeerJS toplantı alanı açın.</p>
+      </div>
+      <form className="meeting-form">
         <input
           type="text"
           placeholder="Toplantı Adı"
-          style={inputs}
+          className="field-input"
           onChange={(e) =>
             props.setMeet({ ...props.meet, name: e.target.value })
           }
@@ -49,26 +52,24 @@ const Create = (props) => {
         <input
           type="password"
           placeholder="Toplantı Şifresi"
-          style={inputs}
+          className="field-input"
           onChange={(e) =>
             props.setMeet({ ...props.meet, password: e.target.value })
           }
           required
         />
         <br />
-        <div className="badge bg-danger" style={error}>
+        <p className="inline-error" role="alert">
           {errorMessage}
-        </div>
-        <br />
+        </p>
         <button
-          className="btn btn-danger"
-          style={button}
+          className="primary-button"
           onClick={(e) => {
             e.preventDefault();
             createMeet();
           }}
         >
-          Oluştur!
+          Toplantı oluştur
         </button>
       </form>
     </div>
