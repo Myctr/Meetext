@@ -10,6 +10,7 @@
   "author": "Muhammed Yasin Çotur",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.22.3",
     "nodemon": "^3.1.14",
     "sqlite3": "^5.1.7"

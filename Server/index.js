@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const {
   all,
   database,
@@ -9,6 +10,16 @@ const {
 } = require("./database");
 
 const app = express();
+const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:3002")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+  })
+);
 app.use(express.json());
 
 const sendDatabaseError = (res, error) => {
