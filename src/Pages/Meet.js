@@ -12,6 +12,11 @@ const Meet = ({ meet, meetingPeer, user }) => {
   const [copied, setCopied] = useState(false);
   const connectionRef = useRef(null);
   const isHost = String(meet.admin_id) === String(user.id);
+  const formatMessageTime = (timestamp) =>
+    new Intl.DateTimeFormat("tr-TR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(timestamp));
 
   useEffect(() => {
     if (!meetingPeer) return undefined;
@@ -94,6 +99,7 @@ const Meet = ({ meet, meetingPeer, user }) => {
       type: "message",
       sender: { id: user.id, name: user.name },
       text: trimmedMessage,
+      sentAt: Date.now(),
     };
     connection.send(message);
     setMessages((currentMessages) => [...currentMessages, message]);
@@ -139,6 +145,9 @@ const Meet = ({ meet, meetingPeer, user }) => {
               >
                 <span className="chat-sender">{message.sender.name}</span>
                 <span>{message.text}</span>
+                <time className="chat-time" dateTime={new Date(message.sentAt).toISOString()}>
+                  {formatMessageTime(message.sentAt)}
+                </time>
               </div>
             ))}
           </div>
