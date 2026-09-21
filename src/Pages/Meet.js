@@ -20,6 +20,11 @@ const Meet = ({ meet, meetingPeer, user }) => {
     };
 
     const handleConnection = (connection) => {
+      if (!connection) {
+        setConnectionStatus("Bağlantı kurulamadı");
+        return;
+      }
+
       connectionRef.current = connection;
       connection.on("open", () => {
         setConnectionStatus("Bağlandı");
@@ -56,17 +61,24 @@ const Meet = ({ meet, meetingPeer, user }) => {
       connection.on("error", () => setConnectionStatus("Bağlantı hatası"));
     };
 
+    const connectToHost = () => {
+      const connection = meetingPeer.connect(meet.conn_id, { reliable: true });
+      handleConnection(connection);
+    };
+
     if (isHost) {
       meetingPeer.on("connection", handleConnection);
       setConnectionStatus("Katılımcı bekleniyor");
+    } else if (meetingPeer.open) {
+      connectToHost();
     } else {
-      const connection = meetingPeer.connect(meet.conn_id, { reliable: true });
-      handleConnection(connection);
+      meetingPeer.once("open", connectToHost);
     }
 
     return () => {
       meetingPeer.off("connection", handleConnection);
-      meetingPeer.destroy();
+      meetingPeer.off("open", connectToHost);
+      connectionRef.current?.close();
       connectionRef.current = null;
     };
   }, [isHost, meet.conn_id, meetingPeer, user.id, user.name]);
