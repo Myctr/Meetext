@@ -22,6 +22,12 @@ const Interface = (props) => {
   const [history, setHistory] = useState();
   const [messageIndex, setMessageIndex] = useState();
   const [meetingPeer, setMeetingPeer] = useState();
+  const changeMenu = (nextMenu) => {
+    if (activeMenu === "meet" && nextMenu !== "meet" && !window.confirm("Toplantıdan ayrılmak istediğinizden emin misiniz?")) {
+      return;
+    }
+    setActiveMenu(nextMenu);
+  };
   useEffect(() => {
     api.get("/showroms").then((res) => {
       setHistory(res.data);
@@ -32,7 +38,7 @@ const Interface = (props) => {
     <div className="workspace">
       <aside className="workspace-sidebar">
         <div className="sidebar-label">Çalışma alanı</div>
-        <Menu active={activeMenu} setActive={setActiveMenu} />
+        <Menu active={activeMenu} setActive={changeMenu} />
       </aside>
       <section className="workspace-panel">
         <div className="workspace-panel-inner">

@@ -2,24 +2,73 @@ import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Participants from "../Components/Participants";
 
+const formatElapsed = (seconds) => {
+  const hours = Math.floor(seconds / 3600).toString().padStart(2, "0");
+  const minutes = Math.floor((seconds % 3600) / 60).toString().padStart(2, "0");
+  const remainingSeconds = (seconds % 60).toString().padStart(2, "0");
+  return `${hours}:${minutes}:${remainingSeconds}`;
+};
+
+const formatMessageTime = (timestamp) => new Intl.DateTimeFormat("tr-TR", {
+  hour: "2-digit",
+  minute: "2-digit",
+}).format(new Date(timestamp));
+
 const Meet = ({ meet, meetingPeer, user }) => {
   const [connectionStatus, setConnectionStatus] = useState("Bağlantı hazırlanıyor");
   const [messages, setMessages] = useState([]);
-  const [participants, setParticipants] = useState([
-    { id: user.id, name: user.name },
-  ]);
+  const [participants, setParticipants] = useState([{ id: user.id, name: user.name }]);
+  const [pendingRequests, setPendingRequests] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [copied, setCopied] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const connectionRef = useRef(null);
+  const pendingConnectionsRef = useRef(new Map());
+  const meetingStartedAtRef = useRef(Date.now());
   const isHost = String(meet.admin_id) === String(user.id);
-  const formatMessageTime = (timestamp) =>
-    new Intl.DateTimeFormat("tr-TR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(timestamp));
+
+  const approveRequest = (request) => {
+    const connection = pendingConnectionsRef.current.get(request.id);
+    if (!connection) return;
+    pendingConnectionsRef.current.delete(request.id);
+    setPendingRequests((currentRequests) => currentRequests.filter((current) => current.id !== request.id));
+    const nextParticipants = participants.some((participant) => String(participant.id) === String(request.user.id))
+      ? participants
+      : [...participants, request.user];
+    connection.send({ type: "join_approved", participants: nextParticipants });
+    connectionRef.current = connection;
+    setParticipants(nextParticipants);
+    setConnectionStatus("Bağlandı");
+    meetingStartedAtRef.current = Date.now();
+  };
+
+  const rejectRequest = (request) => {
+    const connection = pendingConnectionsRef.current.get(request.id);
+    pendingConnectionsRef.current.delete(request.id);
+    setPendingRequests((currentRequests) => currentRequests.filter((current) => current.id !== request.id));
+    connection?.send({ type: "join_rejected" });
+    connection?.close();
+  };
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - meetingStartedAtRef.current) / 1000));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const warnBeforeLeaving = (event) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warnBeforeLeaving);
+    return () => window.removeEventListener("beforeunload", warnBeforeLeaving);
+  }, []);
 
   useEffect(() => {
     if (!meetingPeer) return undefined;
+    const pendingConnections = pendingConnectionsRef.current;
 
     const addMessage = (message) => {
       if (message.type !== "message") return;
@@ -31,48 +80,48 @@ const Meet = ({ meet, meetingPeer, user }) => {
         setConnectionStatus("Bağlantı kurulamadı");
         return;
       }
-
-      connectionRef.current = connection;
       connection.on("open", () => {
-        setConnectionStatus("Bağlandı");
         if (!isHost) {
+          setConnectionStatus("Toplantı sahibinin onayı bekleniyor");
           connection.send({
-            type: "join",
+            type: "join_request",
             user: { id: user.id, name: user.name },
           });
         }
       });
       connection.on("data", (data) => {
-        if (data.type === "join" && isHost) {
-          setParticipants((currentParticipants) => {
-            const nextParticipants = currentParticipants.some(
-              (participant) => String(participant.id) === String(data.user.id),
-            )
-              ? currentParticipants
-              : [...currentParticipants, data.user];
-            connection.send({ type: "participants", participants: nextParticipants });
-            return nextParticipants;
-          });
+        if (data.type === "join_request" && isHost) {
+          pendingConnectionsRef.current.set(String(data.user.id), connection);
+          setPendingRequests((currentRequests) => (
+            currentRequests.some((request) => String(request.id) === String(data.user.id))
+              ? currentRequests
+              : [...currentRequests, { id: data.user.id, user: data.user }]
+          ));
+          setConnectionStatus("Katılımcı izni bekleniyor");
           return;
         }
-        if (data.type === "participants") {
+        if (data.type === "join_approved" && !isHost) {
+          connectionRef.current = connection;
           setParticipants(data.participants);
+          setConnectionStatus("Bağlandı");
+          meetingStartedAtRef.current = Date.now();
+          return;
+        }
+        if (data.type === "join_rejected") {
+          setConnectionStatus("Toplantı sahibi katılım isteğini reddetti");
+          toast.error("Toplantıya katılım isteğiniz reddedildi.");
           return;
         }
         addMessage(data);
       });
       connection.on("close", () => {
-        connectionRef.current = null;
+        if (connectionRef.current === connection) connectionRef.current = null;
         setConnectionStatus("Bağlantı kapandı");
       });
       connection.on("error", () => setConnectionStatus("Bağlantı hatası"));
     };
 
-    const connectToHost = () => {
-      const connection = meetingPeer.connect(meet.conn_id, { reliable: true });
-      handleConnection(connection);
-    };
-
+    const connectToHost = () => handleConnection(meetingPeer.connect(meet.conn_id, { reliable: true }));
     if (isHost) {
       meetingPeer.on("connection", handleConnection);
       setConnectionStatus("Katılımcı bekleniyor");
@@ -86,6 +135,8 @@ const Meet = ({ meet, meetingPeer, user }) => {
       meetingPeer.off("connection", handleConnection);
       meetingPeer.off("open", connectToHost);
       connectionRef.current?.close();
+      pendingConnections.forEach((connection) => connection.close());
+      pendingConnections.clear();
       connectionRef.current = null;
     };
   }, [isHost, meet.conn_id, meetingPeer, user.id, user.name]);
@@ -94,7 +145,6 @@ const Meet = ({ meet, meetingPeer, user }) => {
     const trimmedMessage = messageText.trim();
     const connection = connectionRef.current;
     if (!trimmedMessage || !connection || !connection.open) return;
-
     const message = {
       type: "message",
       sender: { id: user.id, name: user.name },
@@ -123,49 +173,45 @@ const Meet = ({ meet, meetingPeer, user }) => {
         <div>
           <p className="auth-kicker">Canlı toplantı</p>
           <h1 className="panel-title">{meet.name}</h1>
-          <p className="meeting-status">{connectionStatus}</p>
+          <div className="meeting-meta">
+            <p className="meeting-status">{connectionStatus}</p>
+            <span className="meeting-timer">{formatElapsed(elapsedSeconds)}</span>
+          </div>
         </div>
         <div className="meeting-id">
           <span>ID: {meet.conn_id}</span>
-          <button className="copy-button" type="button" onClick={copyMeetingId}>
-            {copied ? "Kopyalandı" : "Kopyala"}
-          </button>
+          <button className="copy-button" type="button" onClick={copyMeetingId}>{copied ? "Kopyalandı" : "Kopyala"}</button>
         </div>
       </div>
+      {isHost && pendingRequests.length > 0 && (
+        <div className="permission-panel">
+          <strong>Katılım istekleri</strong>
+          {pendingRequests.map((request) => (
+            <div className="permission-request" key={request.id}>
+              <span>{request.user.name} toplantıya katılmak istiyor.</span>
+              <div>
+                <button className="primary-button compact-button" type="button" onClick={() => approveRequest(request)}>Kabul et</button>
+                <button className="secondary-button compact-button" type="button" onClick={() => rejectRequest(request)}>Reddet</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="meeting-room-grid">
         <div className="meeting-chat">
           <div className="meeting-chat-box">
-            {messages.length === 0 && (
-              <p className="empty-chat">Mesajlar burada görünecek.</p>
-            )}
+            {messages.length === 0 && <p className="empty-chat">Mesajlar burada görünecek.</p>}
             {messages.map((message, index) => (
-              <div
-                className={String(message.sender.id) === String(user.id) ? "chat-message own" : "chat-message"}
-                key={`${message.sender.id}-${index}`}
-              >
+              <div className={String(message.sender.id) === String(user.id) ? "chat-message own" : "chat-message"} key={`${message.sender.id}-${index}`}>
                 <span className="chat-sender">{message.sender.name}</span>
                 <span>{message.text}</span>
-                <time className="chat-time" dateTime={new Date(message.sentAt).toISOString()}>
-                  {formatMessageTime(message.sentAt)}
-                </time>
+                <time className="chat-time" dateTime={new Date(message.sentAt).toISOString()}>{formatMessageTime(message.sentAt)}</time>
               </div>
             ))}
           </div>
           <div className="meeting-message-box">
-            <input
-              type="text"
-              className="field-input"
-              placeholder="Mesaj yazın..."
-              value={messageText}
-              onChange={(event) => setMessageText(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") sendMessage();
-              }}
-              disabled={connectionStatus !== "Bağlandı"}
-            />
-            <button className="secondary-button" type="button" onClick={sendMessage}>
-              Gönder
-            </button>
+            <input type="text" className="field-input" placeholder="Mesaj yazın..." value={messageText} onChange={(event) => setMessageText(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") sendMessage(); }} disabled={connectionStatus !== "Bağlandı"} />
+            <button className="secondary-button" type="button" onClick={sendMessage} disabled={connectionStatus !== "Bağlandı"}>Gönder</button>
           </div>
         </div>
         <Participants participants={participants} />
