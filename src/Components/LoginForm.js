@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { api } from "../api";
 import toast from "react-hot-toast";
 const LoginForm = (props) => {
   const [username, setUsername] = useState("");
@@ -8,19 +8,13 @@ const LoginForm = (props) => {
 
   const signInHandler = async () => {
     if ((username !== "") & (password !== "")) {
-      await axios({
-        method: "get",
-        url: "http://localhost:3001/signin/" + username + "&" + password,
-      }).then((res) => {
-        console.log(res.data);
+      await api.post("/signin", { nickname: username, password }).then((res) => {
         if (res.data === false) {
-          props.setUser(res.data);
           setError("Kullanıcı adı veya şifre hatalı!");
           toast.error("Kullanıcı adı veya şifre hatalı.");
         } else {
-          props.setUser(res.data);
           toast.success("Giriş başarılı. Arayüze yönlendiriliyorsunuz.");
-          props.signIn(true);
+          props.onAuthenticated(res.data);
         }
       });
     } else {
@@ -32,7 +26,9 @@ const LoginForm = (props) => {
   return (
     <div>
       <h2 className="form-title">Giriş yap</h2>
-      <p className="form-description">Toplantı alanınıza devam etmek için hesabınıza giriş yapın.</p>
+      <p className="form-description">
+        Toplantı alanınıza devam etmek için hesabınıza giriş yapın.
+      </p>
       <form className="auth-form">
         <label className="field-label">
           Kullanıcı adı
@@ -54,16 +50,26 @@ const LoginForm = (props) => {
             required
           />
         </label>
-        <p className="inline-error" role="alert">{errorMessage}</p>
-        <button className="primary-button" type="submit" onClick={(e) => {
-          e.preventDefault();
-          signInHandler();
-        }}>
+        <p className="inline-error" role="alert">
+          {errorMessage}
+        </p>
+        <button
+          className="primary-button"
+          type="submit"
+          onClick={(e) => {
+            e.preventDefault();
+            signInHandler();
+          }}
+        >
           Giriş yap
         </button>
         <p className="form-switch">
           Hesabınız yok mu?{" "}
-          <button className="text-button" type="button" onClick={() => props.form(false)}>
+          <button
+            className="text-button"
+            type="button"
+            onClick={() => props.form(false)}
+          >
             Kayıt olun
           </button>
         </p>

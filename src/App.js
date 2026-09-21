@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
+import { api, restoreSessionToken, setSessionToken } from "./api";
 import Navbar from "./Components/Navbar";
 import Login from "./Pages/Login";
 import Interface from "./Pages/Interface";
@@ -7,14 +8,47 @@ import { Toaster } from "react-hot-toast";
 
 function App() {
   const [user, setUser] = useState();
-  const [login, setLogin] = useState(false);
-  const loginHandler = () => setLogin((isLoggedIn) => !isLoggedIn);
+  const [loadingSession, setLoadingSession] = useState(true);
+
+  useEffect(() => {
+    const token = restoreSessionToken();
+    if (!token) {
+      setLoadingSession(false);
+      return undefined;
+    }
+    api.get("/session")
+      .then((response) => setUser(response.data))
+      .catch(() => setSessionToken(null))
+      .finally(() => setLoadingSession(false));
+    return undefined;
+  }, []);
+
+  const handleAuthenticated = ({ user: authenticatedUser, token }) => {
+    setSessionToken(token);
+    setUser(authenticatedUser);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await api.post("/signout");
+    } catch (error) {
+      // Clear local state when the server cannot be reached.
+    }
+    setSessionToken(null);
+    setUser(undefined);
+  };
+
+  if (loadingSession) return <div className="session-loading">Meetext yükleniyor...</div>;
 
   return (
     <div className="app-shell">
-      <Navbar login={login} user={user} signOut={loginHandler} />
+      <Navbar login={Boolean(user)} user={user} signOut={handleSignOut} />
       <main className="app-content">
-        {login ? <Interface user={user} /> : <Login signIn={loginHandler} setUser={setUser} />}
+        {user ? (
+          <Interface user={user} />
+        ) : (
+          <Login onAuthenticated={handleAuthenticated} />
+        )}
       </main>
       <Toaster
         position="top-right"

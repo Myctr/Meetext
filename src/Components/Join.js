@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { api } from "../api";
 import JoinSvg from "../Assets/Illustrates/JoinSvg";
 import Peer from "peerjs";
 const Join = (props) => {
@@ -7,8 +7,7 @@ const Join = (props) => {
   const joinMeet = async () => {
     if ((props.meet.conn_id !== "") & (props.meet.password !== "")) {
       try {
-        const response = await axios.post("http://localhost:3001/joinroom/", {
-          participant: props.user.id,
+        const response = await api.post("/joinroom", {
           conn_id: props.meet.conn_id,
           password: props.meet.password,
         });
@@ -35,11 +34,15 @@ const Join = (props) => {
 
   return (
     <div className="meeting-form-view">
-      <div className="meeting-illustration"><JoinSvg /></div>
+      <div className="meeting-illustration">
+        <JoinSvg />
+      </div>
       <div>
         <p className="auth-kicker">Mevcut alan</p>
         <h1 className="panel-title">Toplantıya katıl</h1>
-        <p className="panel-description">Toplantı kimliğini ve şifresini girerek görüşmeye devam edin.</p>
+        <p className="panel-description">
+          Toplantı kimliğini ve şifresini girerek görüşmeye devam edin.
+        </p>
       </div>
       <form className="meeting-form">
         <input
@@ -68,7 +71,9 @@ const Join = (props) => {
           required
         />
         <br />
-        <p className="inline-error" role="alert">{errorMessage}</p>
+        <p className="inline-error" role="alert">
+          {errorMessage}
+        </p>
         <button
           className="primary-button"
           onClick={(e) => {

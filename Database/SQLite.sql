@@ -3,7 +3,8 @@ CREATE TABLE tbl_users (
   name TEXT NOT NULL,
   nickname TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
-  rooms TEXT NOT NULL DEFAULT '[]'
+  rooms TEXT NOT NULL DEFAULT '[]',
+  avatar TEXT
 );
 
 CREATE TABLE tbl_rooms (
@@ -23,4 +24,11 @@ CREATE TABLE tbl_messages (
   message TEXT NOT NULL,
   FOREIGN KEY (room_id) REFERENCES tbl_rooms (id),
   FOREIGN KEY (user_id) REFERENCES tbl_users (id)
+);
+
+CREATE TABLE tbl_sessions (
+  token TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES tbl_users (id) ON DELETE CASCADE
 );

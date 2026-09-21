@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { api } from "../api";
 import CreateSvg from "../Assets/Illustrates/CreateSvg";
 import Peer from "peerjs";
 const Create = (props) => {
@@ -13,7 +13,7 @@ const Create = (props) => {
           nextPeer.on("open", () => resolve(nextPeer));
           nextPeer.on("error", reject);
         });
-        const response = await axios.post("http://localhost:3001/createroom/", {
+        const response = await api.post("/createroom", {
           name: props.meet.name,
           password: props.meet.password,
           admin_id: props.user.id,
@@ -32,11 +32,15 @@ const Create = (props) => {
   };
   return (
     <div className="meeting-form-view">
-      <div className="meeting-illustration"><CreateSvg /></div>
+      <div className="meeting-illustration">
+        <CreateSvg />
+      </div>
       <div>
         <p className="auth-kicker">Yeni alan</p>
         <h1 className="panel-title">Toplantı oluştur</h1>
-        <p className="panel-description">Katılımcılarınızla paylaşabileceğiniz yeni bir toplantı alanı açın.</p>
+        <p className="panel-description">
+          Katılımcılarınızla paylaşabileceğiniz yeni bir toplantı alanı açın.
+        </p>
       </div>
       <form className="meeting-form">
         <input

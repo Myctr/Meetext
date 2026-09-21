@@ -4,7 +4,8 @@
   height: 100dvh;
   min-height: 100%;
   overflow: hidden;
-  background-image: linear-gradient(rgba(247, 249, 252, 0.84), rgba(247, 249, 252, 0.9)),
+  background-image:
+    linear-gradient(rgba(247, 249, 252, 0.84), rgba(247, 249, 252, 0.9)),
     url("./Assets/Image/bg.jpg");
   background-position: center;
   background-size: cover;
@@ -15,6 +16,15 @@
   min-height: 0;
   flex: 1;
   overflow: hidden;
+}
+
+.session-loading {
+  display: grid;
+  height: 100dvh;
+  place-items: center;
+  background: var(--paper);
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .auth-page {
@@ -114,7 +124,9 @@
   outline: none;
   background: #fff;
   color: var(--ink);
-  transition: border-color 160ms ease, box-shadow 160ms ease;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .field-input:focus {
@@ -129,7 +141,9 @@
   background: var(--accent);
   color: #fff;
   font-weight: 700;
-  transition: background 160ms ease, transform 160ms ease;
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
 }
 
 .primary-button:hover {

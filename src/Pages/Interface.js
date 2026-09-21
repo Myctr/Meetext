@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { api } from "../api";
 import Menu from "../Components/Menu";
 import Create from "../Components/Create";
 import Join from "../Components/Join";
@@ -22,18 +22,10 @@ const Interface = (props) => {
   const [messageIndex, setMessageIndex] = useState();
   const [meetingPeer, setMeetingPeer] = useState();
   useEffect(() => {
-    axios({
-      method: "get",
-      url:
-        "http://localhost:3001/showroms/" +
-        props.user.nickname +
-        "&" +
-        props.user.password,
-    }).then((res) => {
+    api.get("/showroms").then((res) => {
       setHistory(res.data);
-      console.log(res.data);
     });
-  }, [props.user.nickname, props.user.password]);
+  }, [props.user.id]);
 
   return (
     <div className="workspace">
