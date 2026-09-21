@@ -1,13 +1,13 @@
 import React from "react";
 import avatar from "../Assets/Image/avatar.png";
-const Participants = (props) => {
+const Participants = ({ participants }) => {
   return (
     <aside className="participants-panel">
       <h2 className="participants-title">Katılımcılar</h2>
-      {props.meetParticipants.map((participant, index) => participant && (
-        <div className="participant-card" key={`${participant}-${index}`}>
+      {participants.map((participant) => (
+        <div className="participant-card" key={participant.id}>
           <img src={avatar} alt="" />
-          <span>{participant}</span>
+          <span>{participant.name}</span>
         </div>
       ))}
     </aside>

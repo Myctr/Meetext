@@ -1,31 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import CreateSvg from "../Assets/Illustrates/CreateSvg";
 import Peer from "peerjs";
 const Create = (props) => {
   const [errorMessage, setError] = useState("");
-  const [peer, setPeer] = useState();
-  useEffect(() => {
-    const P = new Peer();
-    setPeer(P);
-  }, []);
 
   const createMeet = async () => {
     if ((props.meet.name !== "") & (props.meet.password !== "")) {
-      await axios({
-        method: "post",
-        url: "http://localhost:3001/createroom/",
-        data: {
+      try {
+        const peer = await new Promise((resolve, reject) => {
+          const nextPeer = new Peer();
+          nextPeer.on("open", () => resolve(nextPeer));
+          nextPeer.on("error", reject);
+        });
+        const response = await axios.post("http://localhost:3001/createroom/", {
           name: props.meet.name,
           password: props.meet.password,
           admin_id: props.user.id,
           conn_id: peer.id,
-          userid: props.user.id,
-        },
-      }).then((res) => {
-        props.setMeet(res.data);
+        });
+
+        props.setMeetingPeer(peer);
+        props.setMeet(response.data);
         props.setActiveMenu("meet");
-      });
+      } catch (error) {
+        setError("Toplantı oluşturulamadı. Lütfen tekrar deneyin.");
+      }
     } else {
       setError("Toplantı adı veya toplantı şifresi alanı boş bırakılamaz!");
     }
@@ -36,7 +36,7 @@ const Create = (props) => {
       <div>
         <p className="auth-kicker">Yeni alan</p>
         <h1 className="panel-title">Toplantı oluştur</h1>
-        <p className="panel-description">Katılımcılarınızla paylaşabileceğiniz yeni bir PeerJS toplantı alanı açın.</p>
+        <p className="panel-description">Katılımcılarınızla paylaşabileceğiniz yeni bir toplantı alanı açın.</p>
       </div>
       <form className="meeting-form">
         <input

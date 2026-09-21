@@ -20,6 +20,7 @@ const Interface = (props) => {
   });
   const [history, setHistory] = useState();
   const [messageIndex, setMessageIndex] = useState();
+  const [meetingPeer, setMeetingPeer] = useState();
   useEffect(() => {
     axios({
       method: "get",
@@ -50,6 +51,7 @@ const Interface = (props) => {
                     user={props.user}
                     meet={meet}
                     setMeet={setMeet}
+                    setMeetingPeer={setMeetingPeer}
                     setActiveMenu={setActiveMenu}
                   />
                 );
@@ -59,6 +61,7 @@ const Interface = (props) => {
                     user={props.user}
                     meet={meet}
                     setMeet={setMeet}
+                    setMeetingPeer={setMeetingPeer}
                     setActiveMenu={setActiveMenu}
                   />
                 );
@@ -74,7 +77,13 @@ const Interface = (props) => {
               case "note":
                 return <Note user={props.user} messageIndex={messageIndex} />;
               case "meet":
-                return <Meet user={props.user} meet={meet} setMeet={setMeet} />;
+                return (
+                  <Meet
+                    user={props.user}
+                    meet={meet}
+                    meetingPeer={meetingPeer}
+                  />
+                );
               default:
                 return <Welcome setActive={setActiveMenu} />;
             }

@@ -1,27 +1,33 @@
 import React, { useState } from "react";
 import axios from "axios";
 import JoinSvg from "../Assets/Illustrates/JoinSvg";
+import Peer from "peerjs";
 const Join = (props) => {
   const [errorMessage, setError] = useState("");
   const joinMeet = async () => {
     if ((props.meet.conn_id !== "") & (props.meet.password !== "")) {
-      await axios({
-        method: "post",
-        url: "http://localhost:3001/joinroom/",
-        data: {
+      try {
+        const response = await axios.post("http://localhost:3001/joinroom/", {
           participant: props.user.id,
           conn_id: props.meet.conn_id,
           password: props.meet.password,
-        },
-      }).then((res) => {
-        if (res === false) {
+        });
+
+        if (response.data === false) {
           setError("Toplantı id veya şifre yanlış!");
         } else {
-          props.setMeet(res.data);
-          console.log(res.data);
+          const peer = await new Promise((resolve, reject) => {
+            const nextPeer = new Peer();
+            nextPeer.on("open", () => resolve(nextPeer));
+            nextPeer.on("error", reject);
+          });
+          props.setMeetingPeer(peer);
+          props.setMeet(response.data);
           props.setActiveMenu("meet");
         }
-      });
+      } catch (error) {
+        setError("Toplantıya bağlanılamadı. Lütfen tekrar deneyin.");
+      }
     } else {
       setError("Toplantı id ve şifre alanları boş bırakılamaz!");
     }
