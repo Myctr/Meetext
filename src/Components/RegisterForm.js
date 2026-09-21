@@ -24,7 +24,7 @@ const RegisterForm = (props) => {
         if (res.data === false) {
           setMessage("Kayıt olmak istediğiniz kullanıcı adı zaten mevcut.");
         } else {
-          props.setUser(res.data[0]);
+          props.setUser(res.data);
           alert("Kayıt işlemi başarılı arayüze yönlendiriliyorsunuz..");
           props.signIn(true);
         }
