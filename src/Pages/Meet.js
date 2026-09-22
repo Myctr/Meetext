@@ -40,7 +40,7 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
   const isHost = String(meet.admin_id) === String(user.id);
 
   const approveRequest = (request) => {
-    const connection = pendingConnectionsRef.current.get(request.id);
+    const connection = pendingConnectionsRef.current.get(String(request.id));
     if (!connection) return;
     pendingConnectionsRef.current.delete(request.id);
     setPendingRequests((currentRequests) =>
@@ -65,7 +65,7 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
   };
 
   const rejectRequest = (request) => {
-    const connection = pendingConnectionsRef.current.get(request.id);
+    const connection = pendingConnectionsRef.current.get(String(request.id));
     pendingConnectionsRef.current.delete(request.id);
     setPendingRequests((currentRequests) =>
       currentRequests.filter((current) => current.id !== request.id),

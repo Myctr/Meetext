@@ -617,7 +617,9 @@
 }
 
 .permission-panel {
+  align-self: start;
   display: grid;
+  height: fit-content;
   gap: 0.65rem;
   padding: 1rem;
   border: 1px solid rgba(240, 79, 97, 0.22);
