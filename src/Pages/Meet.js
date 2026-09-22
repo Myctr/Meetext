@@ -3,39 +3,81 @@ import toast from "react-hot-toast";
 import Participants from "../Components/Participants";
 
 const formatElapsed = (seconds) => {
-  const hours = Math.floor(seconds / 3600).toString().padStart(2, "0");
-  const minutes = Math.floor((seconds % 3600) / 60).toString().padStart(2, "0");
+  const hours = Math.floor(seconds / 3600)
+    .toString()
+    .padStart(2, "0");
+  const minutes = Math.floor((seconds % 3600) / 60)
+    .toString()
+    .padStart(2, "0");
   const remainingSeconds = (seconds % 60).toString().padStart(2, "0");
   return `${hours}:${minutes}:${remainingSeconds}`;
 };
 
-const formatMessageTime = (timestamp) => new Intl.DateTimeFormat("tr-TR", {
-  hour: "2-digit",
-  minute: "2-digit",
-}).format(new Date(timestamp));
+const formatMessageTime = (timestamp) =>
+  new Intl.DateTimeFormat("tr-TR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(timestamp));
 
-const Meet = ({ meet, meetingPeer, user }) => {
-  const [connectionStatus, setConnectionStatus] = useState("Bağlantı hazırlanıyor");
+const RemoteVideo = ({ id, stream }) => {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.srcObject = stream;
+  }, [stream]);
+
+  return (
+    <div className="video-tile">
+      <video ref={videoRef} autoPlay playsInline />
+      <span>Katılımcı {id}</span>
+    </div>
+  );
+};
+
+const Meet = ({ meet, meetingPeer, user, localStream }) => {
+  const [connectionStatus, setConnectionStatus] = useState(
+    "Bağlantı hazırlanıyor",
+  );
   const [messages, setMessages] = useState([]);
-  const [participants, setParticipants] = useState([{ id: user.id, name: user.name }]);
+  const [participants, setParticipants] = useState([
+    { id: user.id, name: user.name },
+  ]);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [copied, setCopied] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [remoteStreams, setRemoteStreams] = useState([]);
+  const [cameraEnabled, setCameraEnabled] = useState(true);
+  const [microphoneEnabled, setMicrophoneEnabled] = useState(true);
+  const localVideoRef = useRef(null);
   const connectionRef = useRef(null);
   const pendingConnectionsRef = useRef(new Map());
   const meetingStartedAtRef = useRef(Date.now());
   const isHost = String(meet.admin_id) === String(user.id);
 
+  useEffect(() => {
+    if (localVideoRef.current) localVideoRef.current.srcObject = localStream;
+  }, [localStream]);
+
   const approveRequest = (request) => {
     const connection = pendingConnectionsRef.current.get(request.id);
     if (!connection) return;
     pendingConnectionsRef.current.delete(request.id);
-    setPendingRequests((currentRequests) => currentRequests.filter((current) => current.id !== request.id));
-    const nextParticipants = participants.some((participant) => String(participant.id) === String(request.user.id))
+    setPendingRequests((currentRequests) =>
+      currentRequests.filter((current) => current.id !== request.id),
+    );
+    const nextParticipants = participants.some(
+      (participant) => String(participant.id) === String(request.user.id),
+    )
       ? participants
       : [...participants, request.user];
     connection.send({ type: "join_approved", participants: nextParticipants });
+    if (localStream) {
+      const mediaCall = meetingPeer.call(connection.peer, localStream);
+      mediaCall.on("stream", (stream) => {
+        setRemoteStreams([{ id: connection.peer, stream }]);
+      });
+    }
     connectionRef.current = connection;
     setParticipants(nextParticipants);
     setConnectionStatus("Bağlandı");
@@ -45,14 +87,18 @@ const Meet = ({ meet, meetingPeer, user }) => {
   const rejectRequest = (request) => {
     const connection = pendingConnectionsRef.current.get(request.id);
     pendingConnectionsRef.current.delete(request.id);
-    setPendingRequests((currentRequests) => currentRequests.filter((current) => current.id !== request.id));
+    setPendingRequests((currentRequests) =>
+      currentRequests.filter((current) => current.id !== request.id),
+    );
     connection?.send({ type: "join_rejected" });
     connection?.close();
   };
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setElapsedSeconds(Math.floor((Date.now() - meetingStartedAtRef.current) / 1000));
+      setElapsedSeconds(
+        Math.floor((Date.now() - meetingStartedAtRef.current) / 1000),
+      );
     }, 1000);
     return () => window.clearInterval(timer);
   }, []);
@@ -92,11 +138,13 @@ const Meet = ({ meet, meetingPeer, user }) => {
       connection.on("data", (data) => {
         if (data.type === "join_request" && isHost) {
           pendingConnectionsRef.current.set(String(data.user.id), connection);
-          setPendingRequests((currentRequests) => (
-            currentRequests.some((request) => String(request.id) === String(data.user.id))
+          setPendingRequests((currentRequests) =>
+            currentRequests.some(
+              (request) => String(request.id) === String(data.user.id),
+            )
               ? currentRequests
-              : [...currentRequests, { id: data.user.id, user: data.user }]
-          ));
+              : [...currentRequests, { id: data.user.id, user: data.user }],
+          );
           setConnectionStatus("Katılımcı izni bekleniyor");
           return;
         }
@@ -121,7 +169,18 @@ const Meet = ({ meet, meetingPeer, user }) => {
       connection.on("error", () => setConnectionStatus("Bağlantı hatası"));
     };
 
-    const connectToHost = () => handleConnection(meetingPeer.connect(meet.conn_id, { reliable: true }));
+    const handleMediaCall = (mediaCall) => {
+      mediaCall.answer(localStream || undefined);
+      mediaCall.on("stream", (stream) => {
+        setRemoteStreams((currentStreams) => {
+          const nextStreams = currentStreams.filter((current) => current.id !== mediaCall.peer);
+          return [...nextStreams, { id: mediaCall.peer, stream }];
+        });
+      });
+    };
+
+    const connectToHost = () =>
+      handleConnection(meetingPeer.connect(meet.conn_id, { reliable: true }));
     if (isHost) {
       meetingPeer.on("connection", handleConnection);
       setConnectionStatus("Katılımcı bekleniyor");
@@ -130,16 +189,27 @@ const Meet = ({ meet, meetingPeer, user }) => {
     } else {
       meetingPeer.once("open", connectToHost);
     }
+    meetingPeer.on("call", handleMediaCall);
 
     return () => {
       meetingPeer.off("connection", handleConnection);
       meetingPeer.off("open", connectToHost);
+      meetingPeer.off("call", handleMediaCall);
       connectionRef.current?.close();
       pendingConnections.forEach((connection) => connection.close());
       pendingConnections.clear();
       connectionRef.current = null;
     };
-  }, [isHost, meet.conn_id, meetingPeer, user.id, user.name]);
+  }, [isHost, localStream, meet.conn_id, meetingPeer, user.id, user.name]);
+
+  const toggleTrack = (kind) => {
+    const nextEnabled = kind === "video" ? !cameraEnabled : !microphoneEnabled;
+    localStream?.getTracks().filter((track) => track.kind === kind).forEach((track) => {
+      track.enabled = nextEnabled;
+    });
+    if (kind === "video") setCameraEnabled(nextEnabled);
+    else setMicrophoneEnabled(nextEnabled);
+  };
 
   const sendMessage = () => {
     const trimmedMessage = messageText.trim();
@@ -175,12 +245,16 @@ const Meet = ({ meet, meetingPeer, user }) => {
           <h1 className="panel-title">{meet.name}</h1>
           <div className="meeting-meta">
             <p className="meeting-status">{connectionStatus}</p>
-            <span className="meeting-timer">{formatElapsed(elapsedSeconds)}</span>
+            <span className="meeting-timer">
+              {formatElapsed(elapsedSeconds)}
+            </span>
           </div>
         </div>
         <div className="meeting-id">
           <span>ID: {meet.conn_id}</span>
-          <button className="copy-button" type="button" onClick={copyMeetingId}>{copied ? "Kopyalandı" : "Kopyala"}</button>
+          <button className="copy-button" type="button" onClick={copyMeetingId}>
+            {copied ? "Kopyalandı" : "Kopyala"}
+          </button>
         </div>
       </div>
       {isHost && pendingRequests.length > 0 && (
@@ -190,8 +264,20 @@ const Meet = ({ meet, meetingPeer, user }) => {
             <div className="permission-request" key={request.id}>
               <span>{request.user.name} toplantıya katılmak istiyor.</span>
               <div>
-                <button className="primary-button compact-button" type="button" onClick={() => approveRequest(request)}>Kabul et</button>
-                <button className="secondary-button compact-button" type="button" onClick={() => rejectRequest(request)}>Reddet</button>
+                <button
+                  className="primary-button compact-button"
+                  type="button"
+                  onClick={() => approveRequest(request)}
+                >
+                  Kabul et
+                </button>
+                <button
+                  className="secondary-button compact-button"
+                  type="button"
+                  onClick={() => rejectRequest(request)}
+                >
+                  Reddet
+                </button>
               </div>
             </div>
           ))}
@@ -199,19 +285,63 @@ const Meet = ({ meet, meetingPeer, user }) => {
       )}
       <div className="meeting-room-grid">
         <div className="meeting-chat">
+          <div className="video-stage">
+            <div className="video-tile local-video-tile">
+              <video ref={localVideoRef} autoPlay muted playsInline />
+              <span>{user.name} (Sen)</span>
+            </div>
+            {remoteStreams.map(({ id, stream }) => (
+              <RemoteVideo key={id} id={id} stream={stream} />
+            ))}
+          </div>
           <div className="meeting-chat-box">
-            {messages.length === 0 && <p className="empty-chat">Mesajlar burada görünecek.</p>}
+            {messages.length === 0 && (
+              <p className="empty-chat">Mesajlar burada görünecek.</p>
+            )}
             {messages.map((message, index) => (
-              <div className={String(message.sender.id) === String(user.id) ? "chat-message own" : "chat-message"} key={`${message.sender.id}-${index}`}>
+              <div
+                className={
+                  String(message.sender.id) === String(user.id)
+                    ? "chat-message own"
+                    : "chat-message"
+                }
+                key={`${message.sender.id}-${index}`}
+              >
                 <span className="chat-sender">{message.sender.name}</span>
                 <span>{message.text}</span>
-                <time className="chat-time" dateTime={new Date(message.sentAt).toISOString()}>{formatMessageTime(message.sentAt)}</time>
+                <time
+                  className="chat-time"
+                  dateTime={new Date(message.sentAt).toISOString()}
+                >
+                  {formatMessageTime(message.sentAt)}
+                </time>
               </div>
             ))}
           </div>
           <div className="meeting-message-box">
-            <input type="text" className="field-input" placeholder="Mesaj yazın..." value={messageText} onChange={(event) => setMessageText(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") sendMessage(); }} disabled={connectionStatus !== "Bağlandı"} />
-            <button className="secondary-button" type="button" onClick={sendMessage} disabled={connectionStatus !== "Bağlandı"}>Gönder</button>
+            <input
+              type="text"
+              className="field-input"
+              placeholder="Mesaj yazın..."
+              value={messageText}
+              onChange={(event) => setMessageText(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") sendMessage();
+              }}
+              disabled={connectionStatus !== "Bağlandı"}
+            />
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={sendMessage}
+              disabled={connectionStatus !== "Bağlandı"}
+            >
+              Gönder
+            </button>
+          </div>
+          <div className="media-controls">
+            <button className={cameraEnabled ? "device-button" : "device-button is-off"} type="button" onClick={() => toggleTrack("video")}>{cameraEnabled ? "Kamerayı kapat" : "Kamerayı aç"}</button>
+            <button className={microphoneEnabled ? "device-button" : "device-button is-off"} type="button" onClick={() => toggleTrack("audio")}>{microphoneEnabled ? "Mikrofonu kapat" : "Mikrofonu aç"}</button>
           </div>
         </div>
         <Participants participants={participants} />
