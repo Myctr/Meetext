@@ -19,21 +19,6 @@ const formatMessageTime = (timestamp) =>
     minute: "2-digit",
   }).format(new Date(timestamp));
 
-const RemoteVideo = ({ id, stream }) => {
-  const videoRef = useRef(null);
-
-  useEffect(() => {
-    if (videoRef.current) videoRef.current.srcObject = stream;
-  }, [stream]);
-
-  return (
-    <div className="video-tile">
-      <video ref={videoRef} autoPlay playsInline />
-      <span>Katılımcı {id}</span>
-    </div>
-  );
-};
-
 const Meet = ({ meet, meetingPeer, user, localStream }) => {
   const [connectionStatus, setConnectionStatus] = useState(
     "Bağlantı hazırlanıyor",
@@ -49,15 +34,10 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
   const [remoteStreams, setRemoteStreams] = useState([]);
   const [cameraEnabled, setCameraEnabled] = useState(true);
   const [microphoneEnabled, setMicrophoneEnabled] = useState(true);
-  const localVideoRef = useRef(null);
   const connectionRef = useRef(null);
   const pendingConnectionsRef = useRef(new Map());
   const meetingStartedAtRef = useRef(Date.now());
   const isHost = String(meet.admin_id) === String(user.id);
-
-  useEffect(() => {
-    if (localVideoRef.current) localVideoRef.current.srcObject = localStream;
-  }, [localStream]);
 
   const approveRequest = (request) => {
     const connection = pendingConnectionsRef.current.get(request.id);
@@ -173,7 +153,9 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
       mediaCall.answer(localStream || undefined);
       mediaCall.on("stream", (stream) => {
         setRemoteStreams((currentStreams) => {
-          const nextStreams = currentStreams.filter((current) => current.id !== mediaCall.peer);
+          const nextStreams = currentStreams.filter(
+            (current) => current.id !== mediaCall.peer,
+          );
           return [...nextStreams, { id: mediaCall.peer, stream }];
         });
       });
@@ -204,9 +186,12 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
 
   const toggleTrack = (kind) => {
     const nextEnabled = kind === "video" ? !cameraEnabled : !microphoneEnabled;
-    localStream?.getTracks().filter((track) => track.kind === kind).forEach((track) => {
-      track.enabled = nextEnabled;
-    });
+    localStream
+      ?.getTracks()
+      .filter((track) => track.kind === kind)
+      .forEach((track) => {
+        track.enabled = nextEnabled;
+      });
     if (kind === "video") setCameraEnabled(nextEnabled);
     else setMicrophoneEnabled(nextEnabled);
   };
@@ -285,15 +270,6 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
       )}
       <div className="meeting-room-grid">
         <div className="meeting-chat">
-          <div className="video-stage">
-            <div className="video-tile local-video-tile">
-              <video ref={localVideoRef} autoPlay muted playsInline />
-              <span>{user.name} (Sen)</span>
-            </div>
-            {remoteStreams.map(({ id, stream }) => (
-              <RemoteVideo key={id} id={id} stream={stream} />
-            ))}
-          </div>
           <div className="meeting-chat-box">
             {messages.length === 0 && (
               <p className="empty-chat">Mesajlar burada görünecek.</p>
@@ -339,12 +315,16 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
               Gönder
             </button>
           </div>
-          <div className="media-controls">
-            <button className={cameraEnabled ? "device-button" : "device-button is-off"} type="button" onClick={() => toggleTrack("video")}>{cameraEnabled ? "Kamerayı kapat" : "Kamerayı aç"}</button>
-            <button className={microphoneEnabled ? "device-button" : "device-button is-off"} type="button" onClick={() => toggleTrack("audio")}>{microphoneEnabled ? "Mikrofonu kapat" : "Mikrofonu aç"}</button>
-          </div>
         </div>
-        <Participants participants={participants} />
+        <Participants
+          cameraEnabled={cameraEnabled}
+          localStream={localStream}
+          microphoneEnabled={microphoneEnabled}
+          onToggleCamera={() => toggleTrack("video")}
+          onToggleMicrophone={() => toggleTrack("audio")}
+          participants={participants}
+          remoteStreams={remoteStreams}
+        />
       </div>
     </div>
   );

@@ -477,7 +477,7 @@
 
 .meeting-chat {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-rows: minmax(0, 1fr) auto;
   min-height: 0;
 }
 
@@ -697,6 +697,33 @@
   min-height: 0;
   overflow-y: auto;
   padding: 1rem;
+}
+
+.participant-video-grid {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.participant-video-grid .video-tile {
+  min-height: 118px;
+}
+
+.participant-video-grid .video-tile video {
+  min-height: 118px;
+}
+
+.participant-media-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0;
+  border-top: 0;
+}
+
+.participant-media-controls .device-button {
+  min-width: 0;
+  padding: 0 0.35rem;
+  font-size: 0.7rem;
 }
 
 .participants-title {
