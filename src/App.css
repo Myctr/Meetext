@@ -477,8 +477,98 @@
 
 .meeting-chat {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
   min-height: 0;
+}
+
+.video-stage {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.6rem;
+  min-height: 150px;
+  padding: 0.75rem;
+  background: #f4f6f8;
+}
+
+.video-tile {
+  position: relative;
+  min-height: 150px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #20252b;
+}
+
+.video-tile video {
+  width: 100%;
+  height: 100%;
+  min-height: 150px;
+  object-fit: cover;
+}
+
+.video-tile span {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.5rem;
+  padding: 0.25rem 0.45rem;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.72rem;
+}
+
+.media-controls {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.device-preview {
+  display: grid;
+  gap: 0.7rem;
+  max-width: 460px;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.device-preview video {
+  width: 100%;
+  max-height: 220px;
+  border-radius: 8px;
+  background: #20252b;
+  object-fit: cover;
+}
+
+.device-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.device-button {
+  min-height: 34px;
+  padding: 0 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.device-button.is-off {
+  border-color: rgba(240, 79, 97, 0.35);
+  background: rgba(240, 79, 97, 0.1);
+  color: var(--accent-dark);
+}
+
+.video-off-label {
+  margin-top: -2.5rem;
+  padding: 0 0.8rem 0.7rem;
+  color: #fff;
+  font-size: 0.8rem;
 }
 
 .meeting-chat-box {

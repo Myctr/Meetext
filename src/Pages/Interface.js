@@ -22,8 +22,13 @@ const Interface = (props) => {
   const [history, setHistory] = useState();
   const [messageIndex, setMessageIndex] = useState();
   const [meetingPeer, setMeetingPeer] = useState();
+  const [localStream, setLocalStream] = useState(null);
   const changeMenu = (nextMenu) => {
-    if (activeMenu === "meet" && nextMenu !== "meet" && !window.confirm("Toplantıdan ayrılmak istediğinizden emin misiniz?")) {
+    if (
+      activeMenu === "meet" &&
+      nextMenu !== "meet" &&
+      !window.confirm("Toplantıdan ayrılmak istediğinizden emin misiniz?")
+    ) {
       return;
     }
     setActiveMenu(nextMenu);
@@ -51,6 +56,7 @@ const Interface = (props) => {
                     meet={meet}
                     setMeet={setMeet}
                     setMeetingPeer={setMeetingPeer}
+                    setLocalStream={setLocalStream}
                     setActiveMenu={setActiveMenu}
                   />
                 );
@@ -61,6 +67,7 @@ const Interface = (props) => {
                     meet={meet}
                     setMeet={setMeet}
                     setMeetingPeer={setMeetingPeer}
+                    setLocalStream={setLocalStream}
                     setActiveMenu={setActiveMenu}
                   />
                 );
@@ -76,13 +83,16 @@ const Interface = (props) => {
               case "note":
                 return <Note user={props.user} messageIndex={messageIndex} />;
               case "profile":
-                return <Profile user={props.user} onUpdated={props.onUserUpdated} />;
+                return (
+                  <Profile user={props.user} onUpdated={props.onUserUpdated} />
+                );
               case "meet":
                 return (
                   <Meet
                     user={props.user}
                     meet={meet}
                     meetingPeer={meetingPeer}
+                    localStream={localStream}
                   />
                 );
               default:

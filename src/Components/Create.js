@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { api } from "../api";
 import CreateSvg from "../Assets/Illustrates/CreateSvg";
 import Peer from "peerjs";
+import DevicePreview from "./DevicePreview";
 const Create = (props) => {
   const [errorMessage, setError] = useState("");
 
@@ -42,6 +43,7 @@ const Create = (props) => {
           Katılımcılarınızla paylaşabileceğiniz yeni bir toplantı alanı açın.
         </p>
       </div>
+      <DevicePreview onStreamReady={props.setLocalStream} />
       <form className="meeting-form">
         <input
           type="text"

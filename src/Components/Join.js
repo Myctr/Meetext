@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { api } from "../api";
 import JoinSvg from "../Assets/Illustrates/JoinSvg";
 import Peer from "peerjs";
+import DevicePreview from "./DevicePreview";
 const Join = (props) => {
   const [errorMessage, setError] = useState("");
   const joinMeet = async () => {
@@ -44,6 +45,7 @@ const Join = (props) => {
           Toplantı kimliğini ve şifresini girerek görüşmeye devam edin.
         </p>
       </div>
+      <DevicePreview onStreamReady={props.setLocalStream} />
       <form className="meeting-form">
         <input
           type="text"
