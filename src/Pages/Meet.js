@@ -41,8 +41,20 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
 
   const approveRequest = (request) => {
     const connection = pendingConnectionsRef.current.get(String(request.id));
-    if (!connection) return;
-    pendingConnectionsRef.current.delete(request.id);
+    if (!connection) {
+      toast.error("Katılım bağlantısı artık kullanılamıyor.");
+      setPendingRequests((currentRequests) =>
+        currentRequests.filter((current) => current.id !== request.id),
+      );
+      return;
+    }
+
+    if (!connection.open) {
+      toast.error("Katılım bağlantısı henüz hazır değil.");
+      return;
+    }
+
+    pendingConnectionsRef.current.delete(String(request.id));
     setPendingRequests((currentRequests) =>
       currentRequests.filter((current) => current.id !== request.id),
     );
@@ -51,27 +63,34 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
     )
       ? participants
       : [...participants, request.user];
-    connection.send({ type: "join_approved", participants: nextParticipants });
-    if (localStream) {
-      const mediaCall = meetingPeer.call(connection.peer, localStream);
-      mediaCall.on("stream", (stream) => {
-        setRemoteStreams([{ id: connection.peer, stream }]);
-      });
+    try {
+      connection.send({ type: "join_approved", participants: nextParticipants });
+      if (localStream) {
+        const mediaCall = meetingPeer.call(connection.peer, localStream);
+        mediaCall.on("stream", (stream) => {
+          setRemoteStreams([{ id: connection.peer, stream }]);
+        });
+      }
+      connectionRef.current = connection;
+      setParticipants(nextParticipants);
+      setConnectionStatus("Bağlandı");
+      meetingStartedAtRef.current = Date.now();
+      toast.success(`${request.user.name} toplantıya katıldı.`);
+    } catch (error) {
+      toast.error("Katılım isteği kabul edilemedi.");
     }
-    connectionRef.current = connection;
-    setParticipants(nextParticipants);
-    setConnectionStatus("Bağlandı");
-    meetingStartedAtRef.current = Date.now();
   };
 
   const rejectRequest = (request) => {
     const connection = pendingConnectionsRef.current.get(String(request.id));
-    pendingConnectionsRef.current.delete(request.id);
+    pendingConnectionsRef.current.delete(String(request.id));
     setPendingRequests((currentRequests) =>
       currentRequests.filter((current) => current.id !== request.id),
     );
-    connection?.send({ type: "join_rejected" });
-    connection?.close();
+    if (!connection) return;
+    connection.send({ type: "join_rejected" });
+    toast.success(`${request.user.name} için katılım isteği reddedildi.`);
+    window.setTimeout(() => connection.close(), 250);
   };
 
   useEffect(() => {
