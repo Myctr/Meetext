@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import avatar from "../Assets/Image/avatar.png";
 
-const VideoTile = ({ label, stream, muted = false }) => {
+const ParticipantMedia = ({ name, stream, muted = false }) => {
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -9,15 +9,20 @@ const VideoTile = ({ label, stream, muted = false }) => {
   }, [stream]);
 
   return (
-    <div className="video-tile">
-      <video ref={videoRef} autoPlay muted={muted} playsInline />
-      <span>{label}</span>
+    <div className={`participant-media ${stream ? "has-video" : "has-avatar"}`}>
+      {stream ? (
+        <video ref={videoRef} autoPlay muted={muted} playsInline />
+      ) : (
+        <img src={avatar} alt="" />
+      )}
+      {!stream && <span>{name.slice(0, 1).toUpperCase()}</span>}
     </div>
   );
 };
 
 const Participants = ({
   cameraEnabled,
+  currentUserId,
   localStream,
   microphoneEnabled,
   onToggleCamera,
@@ -25,14 +30,36 @@ const Participants = ({
   participants,
   remoteStreams,
 }) => {
+  const remoteParticipants = participants.filter(
+    (participant) => String(participant.id) !== String(currentUserId),
+  );
+
   return (
     <aside className="participants-panel">
-      <h2 className="participants-title">Katılımcılar</h2>
-      <div className="participant-video-grid">
-        <VideoTile label="Sen" muted stream={localStream} />
-        {remoteStreams.map(({ id, stream }) => (
-          <VideoTile key={id} label={`Katılımcı ${id}`} stream={stream} />
-        ))}
+      <div className="participants-heading">
+        <h2 className="participants-title">Katılımcılar</h2>
+        <span className="participants-count">{participants.length}</span>
+      </div>
+      <div className="participant-list">
+        {participants.map((participant) => {
+          const isCurrentUser = String(participant.id) === String(currentUserId);
+          const remoteIndex = remoteParticipants.findIndex(
+            (remoteParticipant) => remoteParticipant.id === participant.id,
+          );
+          const remoteStream = remoteStreams[remoteIndex]?.stream;
+          const stream = isCurrentUser ? localStream : remoteStream;
+
+          return (
+            <div className="participant-card" key={participant.id}>
+              <ParticipantMedia muted={isCurrentUser} name={participant.name} stream={stream} />
+              <div className="participant-details">
+                <strong>{isCurrentUser ? "Sen" : participant.name}</strong>
+                <span>{stream ? "Kamera açık" : "Sadece ses veya bekleniyor"}</span>
+              </div>
+              <span className="participant-state" aria-label="Bağlı" />
+            </div>
+          );
+        })}
       </div>
       <div className="media-controls participant-media-controls">
         <button className={cameraEnabled ? "device-button" : "device-button is-off"} type="button" onClick={onToggleCamera}>
@@ -42,13 +69,8 @@ const Participants = ({
           {microphoneEnabled ? "Mikrofon kapat" : "Mikrofon aç"}
         </button>
       </div>
-      {participants.map((participant) => (
-        <div className="participant-card" key={participant.id}>
-          <img src={avatar} alt="" />
-          <span>{participant.name}</span>
-        </div>
-      ))}
     </aside>
   );
 };
+
 export default Participants;

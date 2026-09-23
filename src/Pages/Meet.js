@@ -337,6 +337,7 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
         </div>
         <Participants
           cameraEnabled={cameraEnabled}
+          currentUserId={user.id}
           localStream={localStream}
           microphoneEnabled={microphoneEnabled}
           onToggleCamera={() => toggleTrack("video")}
