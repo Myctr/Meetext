@@ -159,6 +159,24 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
           toast.error("Toplantıya katılım isteğiniz reddedildi.");
           return;
         }
+        if (data.type === "leave" && isHost) {
+          setParticipants((currentParticipants) =>
+            currentParticipants.filter(
+              (participant) =>
+                String(participant.id) !== String(data.user.id),
+            ),
+          );
+          setRemoteStreams((currentStreams) =>
+            currentStreams.filter((current) => current.id !== connection.peer),
+          );
+          connection.close();
+          return;
+        }
+        if (data.type === "host_left") {
+          setConnectionStatus("Toplantı sahibi toplantıdan ayrıldı");
+          toast.error("Toplantı sahibi toplantıyı sonlandırdı.");
+          return;
+        }
         addMessage(data);
       });
       connection.on("close", () => {
@@ -196,7 +214,14 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
       meetingPeer.off("connection", handleConnection);
       meetingPeer.off("open", connectToHost);
       meetingPeer.off("call", handleMediaCall);
-      connectionRef.current?.close();
+      const activeConnection = connectionRef.current;
+      if (activeConnection?.open) {
+        activeConnection.send({
+          type: isHost ? "host_left" : "leave",
+          user: { id: user.id, name: user.name },
+        });
+      }
+      window.setTimeout(() => activeConnection?.close(), 150);
       pendingConnections.forEach((connection) => connection.close());
       pendingConnections.clear();
       connectionRef.current = null;
