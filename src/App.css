@@ -582,11 +582,6 @@
   color: var(--muted);
 }
 
-.empty-chat {
-  margin: auto;
-  color: var(--muted);
-}
-
 .meeting-status {
   display: inline-flex;
   align-items: center;
@@ -765,7 +760,7 @@
   position: relative;
   grid-column: 1 / -1;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   border-radius: 7px;
   background: #20252b;

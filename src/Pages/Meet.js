@@ -64,7 +64,10 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
       ? participants
       : [...participants, request.user];
     try {
-      connection.send({ type: "join_approved", participants: nextParticipants });
+      connection.send({
+        type: "join_approved",
+        participants: nextParticipants,
+      });
       if (localStream) {
         const mediaCall = meetingPeer.call(connection.peer, localStream);
         mediaCall.on("stream", (stream) => {
@@ -162,8 +165,7 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
         if (data.type === "leave" && isHost) {
           setParticipants((currentParticipants) =>
             currentParticipants.filter(
-              (participant) =>
-                String(participant.id) !== String(data.user.id),
+              (participant) => String(participant.id) !== String(data.user.id),
             ),
           );
           setRemoteStreams((currentStreams) =>
@@ -315,9 +317,6 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
       <div className="meeting-room-grid">
         <div className="meeting-chat">
           <div className="meeting-chat-box">
-            {messages.length === 0 && (
-              <p className="empty-chat">Mesajlar burada görünecek.</p>
-            )}
             {messages.map((message, index) => (
               <div
                 className={
