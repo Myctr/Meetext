@@ -7,25 +7,25 @@ export const validationRules = {
   connectionId: { minLength: 6, maxLength: 100 },
 };
 
-export const validateText = (value, label, rule) => {
+export const validateText = (value, label, rule, t) => {
   const normalizedValue = value.trim();
-  if (!normalizedValue) return `${label} zorunludur.`;
+  if (!normalizedValue) return t("validation.required", { label });
   if (normalizedValue.length < rule.minLength) {
-    return `${label} en az ${rule.minLength} karakter olmalı.`;
+    return t("validation.min", { label, count: rule.minLength });
   }
   if (normalizedValue.length > rule.maxLength) {
-    return `${label} en fazla ${rule.maxLength} karakter olabilir.`;
+    return t("validation.max", { label, count: rule.maxLength });
   }
   return "";
 };
 
-export const validatePassword = (value, label = "Şifre") => {
-  if (!value) return `${label} zorunludur.`;
+export const validatePassword = (value, label, t) => {
+  if (!value) return t("validation.required", { label });
   if (value.length < validationRules.password.minLength) {
-    return `${label} en az ${validationRules.password.minLength} karakter olmalı.`;
+    return t("validation.min", { label, count: validationRules.password.minLength });
   }
   if (value.length > validationRules.password.maxLength) {
-    return `${label} en fazla ${validationRules.password.maxLength} karakter olabilir.`;
+    return t("validation.max", { label, count: validationRules.password.maxLength });
   }
   return "";
 };

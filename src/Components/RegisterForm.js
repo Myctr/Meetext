@@ -1,18 +1,29 @@
 import React, { useState } from "react";
 import { api } from "../api";
 import toast from "react-hot-toast";
-import { validatePassword, validateText, validationRules } from "../formValidation";
+import {
+  validatePassword,
+  validateText,
+  validationRules,
+} from "../formValidation";
+import { useTranslation } from "../i18n";
 
 const RegisterForm = (props) => {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const registerHandler = async (event) => {
     event.preventDefault();
-    const nameError = validateText(name, "Ad", validationRules.name);
-    const usernameError = validateText(username, "Kullanıcı adı", validationRules.nickname);
-    const passwordError = validatePassword(password);
+    const nameError = validateText(name, t("auth.name"), validationRules.name, t);
+    const usernameError = validateText(
+      username,
+      t("auth.username"),
+      validationRules.nickname,
+      t,
+    );
+    const passwordError = validatePassword(password, t("auth.password"), t);
     const validationError = nameError || usernameError || passwordError;
     if (validationError) {
       setMessage(validationError);
@@ -27,31 +38,31 @@ const RegisterForm = (props) => {
         password,
       });
       if (response.data === false) {
-        setMessage("Bu kullanıcı adı zaten kullanımda.");
-        toast.error("Bu kullanıcı adı zaten kullanımda.");
+        setMessage(t("auth.usernameTaken"));
+        toast.error(t("auth.usernameTaken"));
         return;
       }
       setMessage("");
-      toast.success("Kayıt başarılı. Arayüze yönlendiriliyorsunuz.");
+      toast.success(t("auth.registerSuccess"));
       props.onAuthenticated(response.data);
     } catch (error) {
-      setMessage("Kayıt yapılamadı. Lütfen tekrar deneyin.");
-      toast.error("Kayıt yapılamadı.");
+      setMessage(t("auth.registerFailed"));
+      toast.error(t("auth.registerFailed"));
     }
   };
   return (
     <div>
-      <h2 className="form-title">Hesap oluştur</h2>
+      <h2 className="form-title">{t("auth.createAccount")}</h2>
       <p className="form-description">
-        Toplantılarınıza hızlıca katılmak için yeni bir hesap oluşturun.
+        {t("auth.registerDescription")}
       </p>
       <form className="auth-form" onSubmit={registerHandler} noValidate>
         <label className="field-label">
-          Ad
+          {t("auth.name")}
           <input
             className="field-input"
             type="text"
-            placeholder="Adınız"
+            placeholder={t("auth.namePlaceholder")}
             onChange={(e) => setName(e.target.value)}
             minLength={validationRules.name.minLength}
             maxLength={validationRules.name.maxLength}
@@ -59,11 +70,11 @@ const RegisterForm = (props) => {
           />
         </label>
         <label className="field-label">
-          Kullanıcı adı
+          {t("auth.username")}
           <input
             className="field-input"
             type="text"
-            placeholder="Kullanıcı adınız"
+            placeholder={t("auth.usernamePlaceholder")}
             onChange={(e) => setUsername(e.target.value)}
             minLength={validationRules.nickname.minLength}
             maxLength={validationRules.nickname.maxLength}
@@ -71,11 +82,11 @@ const RegisterForm = (props) => {
           />
         </label>
         <label className="field-label">
-          Şifre
+          {t("auth.password")}
           <input
             className="field-input"
             type="password"
-            placeholder="Şifreniz"
+            placeholder={t("auth.passwordPlaceholder")}
             onChange={(e) => setPassword(e.target.value)}
             minLength={validationRules.password.minLength}
             maxLength={validationRules.password.maxLength}
@@ -85,20 +96,17 @@ const RegisterForm = (props) => {
         <p className="inline-error" role="alert">
           {message}
         </p>
-        <button
-          className="primary-button"
-          type="submit"
-        >
-          Kayıt ol
+        <button className="primary-button" type="submit">
+          {t("auth.register")}
         </button>
         <p className="form-switch">
-          Zaten hesabınız var mı?{" "}
+          {t("auth.haveAccount")} {" "}
           <button
             className="text-button"
             type="button"
             onClick={() => props.form(true)}
           >
-            Giriş yapın
+            {t("auth.signInLink")}
           </button>
         </p>
       </form>
