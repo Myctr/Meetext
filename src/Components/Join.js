@@ -35,15 +35,17 @@ const Join = (props) => {
 
   return (
     <div className="meeting-form-view">
-      <div className="meeting-illustration">
-        <JoinSvg />
-      </div>
-      <div>
-        <p className="auth-kicker">Mevcut alan</p>
-        <h1 className="panel-title">Toplantıya katıl</h1>
-        <p className="panel-description">
-          Toplantı kimliğini ve şifresini girerek görüşmeye devam edin.
-        </p>
+      <div className="meeting-form-copy">
+        <div className="meeting-illustration">
+          <JoinSvg />
+        </div>
+        <div>
+          <p className="auth-kicker">Mevcut alan</p>
+          <h1 className="panel-title">Toplantıya katıl</h1>
+          <p className="panel-description">
+            Toplantı kimliğini ve şifresini girerek görüşmeye devam edin.
+          </p>
+        </div>
       </div>
       <DevicePreview onStreamReady={props.setLocalStream} />
       <form className="meeting-form">

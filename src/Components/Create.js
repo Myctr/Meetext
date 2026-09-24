@@ -33,15 +33,17 @@ const Create = (props) => {
   };
   return (
     <div className="meeting-form-view">
-      <div className="meeting-illustration">
-        <CreateSvg />
-      </div>
-      <div>
-        <p className="auth-kicker">Yeni alan</p>
-        <h1 className="panel-title">Toplantı oluştur</h1>
-        <p className="panel-description">
-          Katılımcılarınızla paylaşabileceğiniz yeni bir toplantı alanı açın.
-        </p>
+      <div className="meeting-form-copy">
+        <div className="meeting-illustration">
+          <CreateSvg />
+        </div>
+        <div>
+          <p className="auth-kicker">Yeni alan</p>
+          <h1 className="panel-title">Toplantı oluştur</h1>
+          <p className="panel-description">
+            Katılımcılarınızla paylaşabileceğiniz yeni bir toplantı alanı açın.
+          </p>
+        </div>
       </div>
       <DevicePreview onStreamReady={props.setLocalStream} />
       <form className="meeting-form">
