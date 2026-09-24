@@ -1,0 +1,181 @@
+import React, { createContext, useContext, useMemo, useState } from "react";
+
+const LANGUAGE_KEY = "meetext_language";
+
+const translations = {
+  tr: {
+    "app.loading": "Meetext yükleniyor...",
+    "nav.lightMode": "Açık mod",
+    "nav.darkMode": "Koyu mod",
+    "nav.switchToLight": "Açık moda geç",
+    "nav.switchToDark": "Koyu moda geç",
+    "nav.language": "Dil",
+    "nav.signOut": "Çıkış yap",
+    "intro.kicker": "Eşler arası toplantılar",
+    "intro.description": "Görüntülü görüşmeler, yazılı iletişim ve toplantı notları tek bir sakin çalışma alanında.",
+    "auth.signIn": "Giriş yap",
+    "auth.signInDescription": "Toplantı alanınıza devam etmek için hesabınıza giriş yapın.",
+    "auth.username": "Kullanıcı adı",
+    "auth.usernamePlaceholder": "Kullanıcı adınız",
+    "auth.password": "Şifre",
+    "auth.passwordPlaceholder": "Şifreniz",
+    "auth.noAccount": "Hesabınız yok mu?",
+    "auth.register": "Kayıt olun",
+    "auth.createAccount": "Hesap oluştur",
+    "auth.registerDescription": "Toplantılarınıza hızlıca katılmak için yeni bir hesap oluşturun.",
+    "auth.name": "Ad",
+    "auth.namePlaceholder": "Adınız",
+    "auth.haveAccount": "Zaten hesabınız var mı?",
+    "auth.signInLink": "Giriş yapın",
+    "auth.invalidCredentials": "Kullanıcı adı veya şifre hatalı.",
+    "auth.requiredCredentials": "Kullanıcı adı ve şifre gerekli.",
+    "auth.signInSuccess": "Giriş başarılı. Arayüze yönlendiriliyorsunuz.",
+    "auth.signInFailed": "Giriş yapılamadı. Lütfen tekrar deneyin.",
+    "auth.registerSuccess": "Kayıt başarılı. Arayüze yönlendiriliyorsunuz.",
+    "auth.usernameTaken": "Bu kullanıcı adı zaten kullanımda.",
+    "auth.registerFailed": "Kayıt yapılamadı. Lütfen tekrar deneyin.",
+    "menu.workspace": "Çalışma alanı",
+    "menu.create": "Yeni toplantı",
+    "menu.join": "Toplantıya katıl",
+    "menu.history": "Toplantılarım",
+    "menu.profile": "Profilim",
+    "welcome.kicker": "Meetext çalışma alanı",
+    "welcome.title": "Toplantı alanınız hazır.",
+    "welcome.description": "Yeni bir toplantı oluşturun veya size gönderilen toplantı kimliğiyle mevcut bir görüşmeye katılın.",
+    "welcome.action": "Yeni toplantı oluştur",
+    "create.kicker": "Yeni alan",
+    "create.title": "Toplantı oluştur",
+    "create.description": "Katılımcılarınızla paylaşabileceğiniz yeni bir toplantı alanı açın.",
+    "create.namePlaceholder": "Toplantı adı",
+    "create.passwordPlaceholder": "Toplantı şifresi",
+    "create.failed": "Toplantı oluşturulamadı. Lütfen tekrar deneyin.",
+    "join.kicker": "Mevcut alan",
+    "join.title": "Toplantıya katıl",
+    "join.description": "Toplantı kimliğini ve şifresini girerek görüşmeye devam edin.",
+    "join.idPlaceholder": "Toplantı kimliği",
+    "join.invalid": "Toplantı kimliği veya şifre yanlış!",
+    "join.failed": "Toplantıya bağlanılamadı. Lütfen tekrar deneyin.",
+    "join.action": "Katıl",
+    "device.permissionDenied": "Kamera veya mikrofon izni alınamadı.",
+    "device.cameraOff": "Kamera kapalı",
+    "device.turnCameraOff": "Kamerayı kapat",
+    "device.turnCameraOn": "Kamerayı aç",
+    "device.turnMicOff": "Mikrofonu kapat",
+    "device.turnMicOn": "Mikrofonu aç",
+    "history.kicker": "Geçmiş",
+    "history.title": "Toplantılarım",
+    "history.notes": "Notlar",
+    "notes.kicker": "Toplantı notları",
+    "notes.transcript": "Toplantı yazılı konuşma dökümü",
+    "notes.savePdf": "PDF olarak kaydet",
+    "notes.loading": "Konuşma kaydı yükleniyor...",
+    "notes.failed": "Konuşma kaydı yüklenemedi.",
+    "notes.empty": "Bu toplantıda henüz kayıtlı mesaj yok.",
+    "notes.notFound": "Görüntülenecek toplantı bulunamadı.",
+    "profile.kicker": "Hesap",
+    "profile.title": "Profilini düzenle",
+    "profile.description": "Kişisel bilgilerini ve profil görselini güncel tut.",
+    "profile.preview": "Profil önizleme",
+    "profile.chooseImage": "Profil görseli seç",
+    "profile.newPassword": "Yeni şifre",
+    "profile.passwordHint": "Değiştirmek istemiyorsanız boş bırakın",
+    "profile.saving": "Kaydediliyor...",
+    "profile.save": "Değişiklikleri kaydet",
+    "profile.imageTooLarge": "500 KB'dan küçük bir görsel seçin.",
+    "profile.updated": "Profil güncellendi.",
+    "profile.updateFailed": "Profil güncellenemedi.",
+    "meeting.preparing": "Bağlantı hazırlanıyor",
+    "meeting.leaveConfirm": "Toplantıdan ayrılmak istediğinizden emin misiniz?",
+    "meeting.connected": "Bağlandı",
+    "meeting.connectionFailed": "Bağlantı kurulamadı",
+    "meeting.awaitingApproval": "Toplantı sahibinin onayı bekleniyor",
+    "meeting.permissionPending": "Katılımcı izni bekleniyor",
+    "meeting.rejected": "Toplantı sahibi katılım isteğini reddetti",
+    "meeting.hostLeft": "Toplantı sahibi toplantıdan ayrıldı",
+    "meeting.closed": "Bağlantı kapandı",
+    "meeting.error": "Bağlantı hatası",
+    "meeting.waiting": "Katılımcı bekleniyor",
+    "meeting.connectionUnavailable": "Katılım bağlantısı artık kullanılamıyor.",
+    "meeting.connectionNotReady": "Katılım bağlantısı henüz hazır değil.",
+    "meeting.joined": "{name} toplantıya katıldı.",
+    "meeting.approveFailed": "Katılım isteği kabul edilemedi.",
+    "meeting.rejectedFor": "{name} için katılım isteği reddedildi.",
+    "meeting.rejectedToast": "Toplantıya katılım isteğiniz reddedildi.",
+    "meeting.hostLeftToast": "Toplantı sahibi toplantıyı sonlandırdı.",
+    "meeting.recordFailed": "Mesaj gönderildi ancak toplantı kaydına eklenemedi.",
+    "meeting.idCopied": "Toplantı kimliği kopyalandı.",
+    "meeting.idCopyFailed": "Toplantı kimliği kopyalanamadı.",
+    "meeting.kicker": "Canlı toplantı",
+    "meeting.id": "Kimlik",
+    "meeting.copy": "Kopyala",
+    "meeting.copied": "Kopyalandı",
+    "meeting.requests": "Katılım istekleri",
+    "meeting.request": "{name} toplantıya katılmak istiyor.",
+    "meeting.approve": "Kabul et",
+    "meeting.reject": "Reddet",
+    "meeting.messagePlaceholder": "Mesaj yazın...",
+    "meeting.send": "Gönder",
+    "participants.title": "Katılımcılar",
+    "participants.you": "Sen",
+    "participants.cameraOn": "Kamera açık",
+    "participants.cameraOff": "Kamera kapalı",
+    "participants.audioOnly": "Sadece ses veya bekleniyor",
+    "participants.connected": "Bağlı",
+    "participants.turnCameraOff": "Kamera kapat",
+    "participants.turnCameraOn": "Kamera aç",
+    "participants.turnMicOff": "Mikrofon kapat",
+    "participants.turnMicOn": "Mikrofon aç",
+    "validation.required": "{label} zorunludur.",
+    "validation.min": "{label} en az {count} karakter olmalı.",
+    "validation.max": "{label} en fazla {count} karakter olabilir.",
+    "labels.meetingName": "Toplantı adı",
+    "labels.meetingPassword": "Toplantı şifresi",
+    "labels.meetingId": "Toplantı kimliği",
+  },
+  en: {
+    "app.loading": "Meetext is loading...",
+    "nav.lightMode": "Light mode", "nav.darkMode": "Dark mode", "nav.switchToLight": "Switch to light mode", "nav.switchToDark": "Switch to dark mode", "nav.language": "Language", "nav.signOut": "Sign out",
+    "intro.kicker": "Peer-to-peer meetings", "intro.description": "Video calls, written communication, and meeting notes in one calm workspace.",
+    "auth.signIn": "Sign in", "auth.signInDescription": "Sign in to continue to your meeting workspace.", "auth.username": "Username", "auth.usernamePlaceholder": "Your username", "auth.password": "Password", "auth.passwordPlaceholder": "Your password", "auth.noAccount": "Don't have an account?", "auth.register": "Register", "auth.createAccount": "Create an account", "auth.registerDescription": "Create an account to join your meetings quickly.", "auth.name": "Name", "auth.namePlaceholder": "Your name", "auth.haveAccount": "Already have an account?", "auth.signInLink": "Sign in",
+    "auth.invalidCredentials": "Username or password is incorrect.", "auth.requiredCredentials": "Username and password are required.", "auth.signInSuccess": "Signed in. Redirecting to your workspace.", "auth.signInFailed": "Could not sign in. Please try again.", "auth.registerSuccess": "Registered successfully. Redirecting to your workspace.", "auth.usernameTaken": "This username is already in use.", "auth.registerFailed": "Could not register. Please try again.",
+    "menu.workspace": "Workspace", "menu.create": "New meeting", "menu.join": "Join meeting", "menu.history": "My meetings", "menu.profile": "My profile",
+    "welcome.kicker": "Meetext workspace", "welcome.title": "Your meeting space is ready.", "welcome.description": "Create a new meeting or join an existing call with the meeting ID you received.", "welcome.action": "Create a new meeting",
+    "create.kicker": "New space", "create.title": "Create meeting", "create.description": "Open a new meeting space to share with your participants.", "create.namePlaceholder": "Meeting name", "create.passwordPlaceholder": "Meeting password", "create.failed": "Could not create the meeting. Please try again.",
+    "join.kicker": "Existing space", "join.title": "Join meeting", "join.description": "Enter the meeting ID and password to continue to the call.", "join.idPlaceholder": "Meeting ID", "join.invalid": "Meeting ID or password is incorrect!", "join.failed": "Could not join the meeting. Please try again.", "join.action": "Join",
+    "device.permissionDenied": "Camera or microphone permission was not granted.", "device.cameraOff": "Camera off", "device.turnCameraOff": "Turn camera off", "device.turnCameraOn": "Turn camera on", "device.turnMicOff": "Turn microphone off", "device.turnMicOn": "Turn microphone on",
+    "history.kicker": "History", "history.title": "My meetings", "history.notes": "Notes", "notes.kicker": "Meeting notes", "notes.transcript": "Written meeting transcript", "notes.savePdf": "Save as PDF", "notes.loading": "Loading transcript...", "notes.failed": "Could not load the transcript.", "notes.empty": "There are no saved messages in this meeting yet.", "notes.notFound": "No meeting is available to display.",
+    "profile.kicker": "Account", "profile.title": "Edit your profile", "profile.description": "Keep your personal details and profile image up to date.", "profile.preview": "Profile preview", "profile.chooseImage": "Choose profile image", "profile.newPassword": "New password", "profile.passwordHint": "Leave blank if you do not want to change it", "profile.saving": "Saving...", "profile.save": "Save changes", "profile.imageTooLarge": "Choose an image smaller than 500 KB.", "profile.updated": "Profile updated.", "profile.updateFailed": "Could not update the profile.",
+    "meeting.preparing": "Preparing connection", "meeting.leaveConfirm": "Are you sure you want to leave the meeting?", "meeting.connected": "Connected", "meeting.connectionFailed": "Could not connect", "meeting.awaitingApproval": "Waiting for the meeting owner's approval", "meeting.permissionPending": "Participant approval pending", "meeting.rejected": "The meeting owner rejected your request", "meeting.hostLeft": "The meeting owner left the meeting", "meeting.closed": "Connection closed", "meeting.error": "Connection error", "meeting.waiting": "Waiting for a participant", "meeting.connectionUnavailable": "The join connection is no longer available.", "meeting.connectionNotReady": "The join connection is not ready yet.", "meeting.joined": "{name} joined the meeting.", "meeting.approveFailed": "Could not approve the join request.", "meeting.rejectedFor": "Join request rejected for {name}.", "meeting.rejectedToast": "Your request to join the meeting was rejected.", "meeting.hostLeftToast": "The meeting owner ended the meeting.", "meeting.recordFailed": "Message was sent but could not be saved to the meeting record.", "meeting.idCopied": "Meeting ID copied.", "meeting.idCopyFailed": "Could not copy the meeting ID.", "meeting.kicker": "Live meeting", "meeting.id": "ID", "meeting.copy": "Copy", "meeting.copied": "Copied", "meeting.requests": "Join requests", "meeting.request": "{name} wants to join the meeting.", "meeting.approve": "Accept", "meeting.reject": "Reject", "meeting.messagePlaceholder": "Write a message...", "meeting.send": "Send",
+    "participants.title": "Participants", "participants.you": "You", "participants.cameraOn": "Camera on", "participants.cameraOff": "Camera off", "participants.audioOnly": "Audio only or waiting", "participants.connected": "Connected", "participants.turnCameraOff": "Turn camera off", "participants.turnCameraOn": "Turn camera on", "participants.turnMicOff": "Turn microphone off", "participants.turnMicOn": "Turn microphone on",
+    "validation.required": "{label} is required.", "validation.min": "{label} must be at least {count} characters.", "validation.max": "{label} can be at most {count} characters.", "labels.meetingName": "Meeting name", "labels.meetingPassword": "Meeting password", "labels.meetingId": "Meeting ID",
+  },
+};
+
+const I18nContext = createContext(null);
+
+const getInitialLanguage = () => {
+  const storedLanguage = localStorage.getItem(LANGUAGE_KEY);
+  if (storedLanguage === "tr" || storedLanguage === "en") return storedLanguage;
+  return navigator.language.toLowerCase().startsWith("tr") ? "tr" : "en";
+};
+
+export const I18nProvider = ({ children }) => {
+  const [language, setLanguage] = useState(getInitialLanguage);
+  const value = useMemo(() => {
+    const t = (key, values = {}) =>
+      Object.entries(values).reduce(
+        (text, [name, replacement]) =>
+          text.replaceAll(`{${name}}`, String(replacement)),
+        translations[language][key] || key,
+      );
+    const changeLanguage = (nextLanguage) => {
+      localStorage.setItem(LANGUAGE_KEY, nextLanguage);
+      setLanguage(nextLanguage);
+    };
+    return { language, changeLanguage, t };
+  }, [language]);
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+};
+
+export const useTranslation = () => useContext(I18nContext);
