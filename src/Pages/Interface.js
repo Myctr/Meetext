@@ -45,7 +45,13 @@ const Interface = (props) => {
         <div className="sidebar-label">Çalışma alanı</div>
         <Menu active={activeMenu} setActive={changeMenu} />
       </aside>
-      <section className="workspace-panel">
+      <section
+        className={
+          activeMenu === "meet"
+            ? "workspace-panel is-meeting"
+            : "workspace-panel"
+        }
+      >
         <div className="workspace-panel-inner">
           {(() => {
             switch (activeMenu) {

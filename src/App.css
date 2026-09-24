@@ -272,6 +272,11 @@
   padding: clamp(1.25rem, 4vw, 3rem);
 }
 
+.workspace-panel.is-meeting,
+.workspace-panel.is-meeting .workspace-panel-inner {
+  overflow: hidden;
+}
+
 .welcome-view {
   display: flex;
   min-height: 100%;
@@ -414,6 +419,7 @@
   gap: 1rem;
   height: 100%;
   min-height: 0;
+  overflow: hidden;
 }
 
 .meeting-room-header {
@@ -883,6 +889,7 @@
 
   .workspace-panel {
     flex: 1;
+    min-height: 0;
   }
 
   .meeting-room-header {
