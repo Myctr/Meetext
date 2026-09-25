@@ -1,25 +1,38 @@
 import React, { useState } from "react";
 import { api } from "../api";
 import toast from "react-hot-toast";
+import { validatePassword, validateText, validationRules } from "../formValidation";
 const LoginForm = (props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setError] = useState("");
 
-  const signInHandler = async () => {
-    if ((username !== "") & (password !== "")) {
-      await api.post("/signin", { nickname: username, password }).then((res) => {
-        if (res.data === false) {
-          setError("Kullanıcı adı veya şifre hatalı!");
-          toast.error("Kullanıcı adı veya şifre hatalı.");
-        } else {
-          toast.success("Giriş başarılı. Arayüze yönlendiriliyorsunuz.");
-          props.onAuthenticated(res.data);
-        }
-      });
-    } else {
-      setError("Kullanıcı adı veya şifre alanı boş bırakılamaz!");
+  const signInHandler = async (event) => {
+    event.preventDefault();
+    const usernameError = validateText(username, "Kullanıcı adı", validationRules.nickname);
+    const passwordError = validatePassword(password);
+    if (usernameError || passwordError) {
+      setError(usernameError || passwordError);
       toast.error("Kullanıcı adı ve şifre gerekli.");
+      return;
+    }
+
+    try {
+      const response = await api.post("/signin", {
+        nickname: username.trim(),
+        password,
+      });
+      if (response.data === false) {
+        setError("Kullanıcı adı veya şifre hatalı.");
+        toast.error("Kullanıcı adı veya şifre hatalı.");
+        return;
+      }
+      setError("");
+      toast.success("Giriş başarılı. Arayüze yönlendiriliyorsunuz.");
+      props.onAuthenticated(response.data);
+    } catch (error) {
+      setError("Giriş yapılamadı. Lütfen tekrar deneyin.");
+      toast.error("Giriş yapılamadı.");
     }
   };
 
@@ -29,7 +42,7 @@ const LoginForm = (props) => {
       <p className="form-description">
         Toplantı alanınıza devam etmek için hesabınıza giriş yapın.
       </p>
-      <form className="auth-form">
+      <form className="auth-form" onSubmit={signInHandler} noValidate>
         <label className="field-label">
           Kullanıcı adı
           <input
@@ -37,7 +50,10 @@ const LoginForm = (props) => {
             type="text"
             placeholder="Kullanıcı adınız"
             onChange={(e) => setUsername(e.target.value)}
-            required
+            minLength={validationRules.nickname.minLength}
+            maxLength={validationRules.nickname.maxLength}
+            autoComplete="username"
+            aria-invalid={Boolean(errorMessage)}
           />
         </label>
         <label className="field-label">
@@ -47,7 +63,10 @@ const LoginForm = (props) => {
             type="password"
             placeholder="Şifreniz"
             onChange={(e) => setPassword(e.target.value)}
-            required
+            minLength={validationRules.password.minLength}
+            maxLength={validationRules.password.maxLength}
+            autoComplete="current-password"
+            aria-invalid={Boolean(errorMessage)}
           />
         </label>
         <p className="inline-error" role="alert">
@@ -56,10 +75,6 @@ const LoginForm = (props) => {
         <button
           className="primary-button"
           type="submit"
-          onClick={(e) => {
-            e.preventDefault();
-            signInHandler();
-          }}
         >
           Giriş yap
         </button>

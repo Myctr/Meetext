@@ -3,11 +3,19 @@ import { api } from "../api";
 import JoinSvg from "../Assets/Illustrates/JoinSvg";
 import Peer from "peerjs";
 import DevicePreview from "./DevicePreview";
+import { validatePassword, validateText, validationRules } from "../formValidation";
 const Join = (props) => {
   const [errorMessage, setError] = useState("");
-  const joinMeet = async () => {
-    if ((props.meet.conn_id !== "") & (props.meet.password !== "")) {
-      try {
+  const joinMeet = async (event) => {
+    event.preventDefault();
+    const connectionIdError = validateText(props.meet.conn_id, "Toplantı ID", validationRules.connectionId);
+    const passwordError = validatePassword(props.meet.password, "Toplantı şifresi");
+    if (connectionIdError || passwordError) {
+      setError(connectionIdError || passwordError);
+      return;
+    }
+
+    try {
         const response = await api.post("/joinroom", {
           conn_id: props.meet.conn_id,
           password: props.meet.password,
@@ -25,11 +33,8 @@ const Join = (props) => {
           props.setMeet(response.data);
           props.setActiveMenu("meet");
         }
-      } catch (error) {
-        setError("Toplantıya bağlanılamadı. Lütfen tekrar deneyin.");
-      }
-    } else {
-      setError("Toplantı id ve şifre alanları boş bırakılamaz!");
+    } catch (error) {
+      setError("Toplantıya bağlanılamadı. Lütfen tekrar deneyin.");
     }
   };
 
@@ -48,31 +53,37 @@ const Join = (props) => {
         </div>
       </div>
       <DevicePreview onStreamReady={props.setLocalStream} />
-      <form className="meeting-form">
+      <form className="meeting-form" onSubmit={joinMeet} noValidate>
         <input
           type="text"
           placeholder="Toplantı Id"
           className="field-input"
+          required
+          autoComplete="off"
           onChange={(e) =>
             props.setMeet({
               ...props.meet,
               conn_id: e.target.value,
             })
           }
-          required
+          minLength={validationRules.connectionId.minLength}
+          maxLength={validationRules.connectionId.maxLength}
         />
         <br />
         <input
           type="password"
           placeholder="Toplantı Şifresi"
           className="field-input"
+          required
+          autoComplete="current-password"
           onChange={(e) =>
             props.setMeet({
               ...props.meet,
               password: e.target.value,
             })
           }
-          required
+          minLength={validationRules.roomPassword.minLength}
+          maxLength={validationRules.roomPassword.maxLength}
         />
         <br />
         <p className="inline-error" role="alert">
@@ -80,10 +91,7 @@ const Join = (props) => {
         </p>
         <button
           className="primary-button"
-          onClick={(e) => {
-            e.preventDefault();
-            joinMeet();
-          }}
+          type="submit"
         >
           Katıl!
         </button>

@@ -3,13 +3,21 @@ import { api } from "../api";
 import CreateSvg from "../Assets/Illustrates/CreateSvg";
 import Peer from "peerjs";
 import DevicePreview from "./DevicePreview";
+import { validatePassword, validateText, validationRules } from "../formValidation";
 const Create = (props) => {
   const [errorMessage, setError] = useState("");
 
-  const createMeet = async () => {
-    if ((props.meet.name !== "") & (props.meet.password !== "")) {
-      try {
-        const peer = await new Promise((resolve, reject) => {
+  const createMeet = async (event) => {
+    event.preventDefault();
+    const nameError = validateText(props.meet.name, "Toplantı adı", validationRules.roomName);
+    const passwordError = validatePassword(props.meet.password, "Toplantı şifresi");
+    if (nameError || passwordError) {
+      setError(nameError || passwordError);
+      return;
+    }
+
+    try {
+      const peer = await new Promise((resolve, reject) => {
           const nextPeer = new Peer();
           nextPeer.on("open", () => resolve(nextPeer));
           nextPeer.on("error", reject);
@@ -24,11 +32,8 @@ const Create = (props) => {
         props.setMeetingPeer(peer);
         props.setMeet(response.data);
         props.setActiveMenu("meet");
-      } catch (error) {
-        setError("Toplantı oluşturulamadı. Lütfen tekrar deneyin.");
-      }
-    } else {
-      setError("Toplantı adı veya toplantı şifresi alanı boş bırakılamaz!");
+    } catch (error) {
+      setError("Toplantı oluşturulamadı. Lütfen tekrar deneyin.");
     }
   };
   return (
@@ -46,25 +51,31 @@ const Create = (props) => {
         </div>
       </div>
       <DevicePreview onStreamReady={props.setLocalStream} />
-      <form className="meeting-form">
+      <form className="meeting-form" onSubmit={createMeet} noValidate>
         <input
           type="text"
           placeholder="Toplantı Adı"
           className="field-input"
+          required
+          autoComplete="off"
           onChange={(e) =>
             props.setMeet({ ...props.meet, name: e.target.value })
           }
-          required
+          minLength={validationRules.roomName.minLength}
+          maxLength={validationRules.roomName.maxLength}
         />
         <br />
         <input
           type="password"
           placeholder="Toplantı Şifresi"
           className="field-input"
+          required
+          autoComplete="new-password"
           onChange={(e) =>
             props.setMeet({ ...props.meet, password: e.target.value })
           }
-          required
+          minLength={validationRules.roomPassword.minLength}
+          maxLength={validationRules.roomPassword.maxLength}
         />
         <br />
         <p className="inline-error" role="alert">
@@ -72,10 +83,7 @@ const Create = (props) => {
         </p>
         <button
           className="primary-button"
-          onClick={(e) => {
-            e.preventDefault();
-            createMeet();
-          }}
+          type="submit"
         >
           Toplantı oluştur
         </button>

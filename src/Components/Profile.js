@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "../api";
+import { validatePassword, validateText, validationRules } from "../formValidation";
 
 const Profile = ({ user, onUpdated }) => {
   const [name, setName] = useState(user.name);
@@ -23,11 +24,19 @@ const Profile = ({ user, onUpdated }) => {
 
   const saveProfile = async (event) => {
     event.preventDefault();
+    const nameError = validateText(name, "Ad", validationRules.name);
+    const nicknameError = validateText(nickname, "Kullanıcı adı", validationRules.nickname);
+    const passwordError = password ? validatePassword(password, "Yeni şifre") : "";
+    const validationError = nameError || nicknameError || passwordError;
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
     setSaving(true);
     try {
       const response = await api.put("/profile", {
-        name,
-        nickname,
+        name: name.trim(),
+        nickname: nickname.trim(),
         password: password || undefined,
         avatar: avatar || null,
       });
@@ -45,17 +54,56 @@ const Profile = ({ user, onUpdated }) => {
     <div className="profile-view">
       <p className="auth-kicker">Hesap</p>
       <h1 className="panel-title">Profilini düzenle</h1>
-      <p className="panel-description">Kişisel bilgilerini ve profil görselini güncel tut.</p>
+      <p className="panel-description">
+        Kişisel bilgilerini ve profil görselini güncel tut.
+      </p>
       <form className="profile-form" onSubmit={saveProfile}>
         <label className="avatar-picker">
-          {avatar ? <img src={avatar} alt="Profil önizleme" /> : <span>{name.slice(0, 1).toUpperCase()}</span>}
+          {avatar ? (
+            <img src={avatar} alt="Profil önizleme" />
+          ) : (
+            <span>{name.slice(0, 1).toUpperCase()}</span>
+          )}
           <input type="file" accept="image/*" onChange={handleAvatar} />
           <strong>Profil görseli seç</strong>
         </label>
-        <label className="field-label">Ad<input className="field-input" value={name} onChange={(event) => setName(event.target.value)} /></label>
-        <label className="field-label">Kullanıcı adı<input className="field-input" value={nickname} onChange={(event) => setNickname(event.target.value)} /></label>
-        <label className="field-label">Yeni şifre<input className="field-input" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Değiştirmek istemiyorsanız boş bırakın" /></label>
-        <button className="primary-button" type="submit" disabled={saving}>{saving ? "Kaydediliyor..." : "Değişiklikleri kaydet"}</button>
+        <label className="field-label">
+          Ad
+          <input
+            className="field-input"
+            value={name}
+            required
+            minLength={validationRules.name.minLength}
+            maxLength={validationRules.name.maxLength}
+            onChange={(event) => setName(event.target.value)}
+          />
+        </label>
+        <label className="field-label">
+          Kullanıcı adı
+          <input
+            className="field-input"
+            value={nickname}
+            required
+            minLength={validationRules.nickname.minLength}
+            maxLength={validationRules.nickname.maxLength}
+            onChange={(event) => setNickname(event.target.value)}
+          />
+        </label>
+        <label className="field-label">
+          Yeni şifre
+          <input
+            className="field-input"
+            type="password"
+            value={password}
+            minLength={validationRules.password.minLength}
+            maxLength={validationRules.password.maxLength}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Değiştirmek istemiyorsanız boş bırakın"
+          />
+        </label>
+        <button className="primary-button" type="submit" disabled={saving}>
+          {saving ? "Kaydediliyor..." : "Değişiklikleri kaydet"}
+        </button>
       </form>
     </div>
   );
