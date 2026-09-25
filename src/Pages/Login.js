@@ -10,10 +10,7 @@ const Login = (props) => {
       <Intro />
       <div className="auth-card">
         {form ? (
-          <LoginForm
-            onAuthenticated={props.onAuthenticated}
-            form={setForm}
-          />
+          <LoginForm onAuthenticated={props.onAuthenticated} form={setForm} />
         ) : (
           <RegisterForm
             onAuthenticated={props.onAuthenticated}

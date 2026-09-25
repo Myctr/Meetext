@@ -8,8 +8,10 @@ import Meet from "../Pages/Meet";
 import Welcome from "../Components/Welcome";
 import Note from "../Components/Note";
 import Profile from "../Components/Profile";
+import { useTranslation } from "../i18n";
 
 const Interface = (props) => {
+  const { t } = useTranslation();
   const [activeMenu, setActiveMenu] = useState();
   const [meet, setMeet] = useState({
     id: "",
@@ -20,14 +22,22 @@ const Interface = (props) => {
     participant: "",
   });
   const [history, setHistory] = useState();
-  const [messageIndex, setMessageIndex] = useState();
+  const [selectedMeeting, setSelectedMeeting] = useState();
   const [meetingPeer, setMeetingPeer] = useState();
   const [localStream, setLocalStream] = useState(null);
+  const addToHistory = (room) => {
+    setHistory((currentHistory) => [
+      room,
+      ...(currentHistory || []).filter(
+        (currentRoom) => currentRoom.id !== room.id,
+      ),
+    ]);
+  };
   const changeMenu = (nextMenu) => {
     if (
       activeMenu === "meet" &&
       nextMenu !== "meet" &&
-      !window.confirm("Toplantıdan ayrılmak istediğinizden emin misiniz?")
+      !window.confirm(t("meeting.leaveConfirm"))
     ) {
       return;
     }
@@ -42,7 +52,7 @@ const Interface = (props) => {
   return (
     <div className="workspace">
       <aside className="workspace-sidebar">
-        <div className="sidebar-label">Çalışma alanı</div>
+        <div className="sidebar-label">{t("menu.workspace")}</div>
         <Menu active={activeMenu} setActive={changeMenu} />
       </aside>
       <section
@@ -64,6 +74,7 @@ const Interface = (props) => {
                     setMeetingPeer={setMeetingPeer}
                     setLocalStream={setLocalStream}
                     setActiveMenu={setActiveMenu}
+                    onMeetingSaved={addToHistory}
                   />
                 );
               case "join":
@@ -75,6 +86,7 @@ const Interface = (props) => {
                     setMeetingPeer={setMeetingPeer}
                     setLocalStream={setLocalStream}
                     setActiveMenu={setActiveMenu}
+                    onMeetingSaved={addToHistory}
                   />
                 );
               case "history":
@@ -82,12 +94,12 @@ const Interface = (props) => {
                   <History
                     history={history}
                     user={props.user}
-                    setMessageIndex={setMessageIndex}
+                    setMeeting={setSelectedMeeting}
                     setActive={setActiveMenu}
                   />
                 );
               case "note":
-                return <Note user={props.user} messageIndex={messageIndex} />;
+                return <Note meeting={selectedMeeting} />;
               case "profile":
                 return (
                   <Profile user={props.user} onUpdated={props.onUserUpdated} />
