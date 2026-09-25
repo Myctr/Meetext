@@ -3,38 +3,54 @@ import { api } from "../api";
 import JoinSvg from "../Assets/Illustrates/JoinSvg";
 import Peer from "peerjs";
 import DevicePreview from "./DevicePreview";
-import { validatePassword, validateText, validationRules } from "../formValidation";
+import {
+  validatePassword,
+  validateText,
+  validationRules,
+} from "../formValidation";
+import { useTranslation } from "../i18n";
 const Join = (props) => {
+  const { t } = useTranslation();
   const [errorMessage, setError] = useState("");
   const joinMeet = async (event) => {
     event.preventDefault();
-    const connectionIdError = validateText(props.meet.conn_id, "Toplantı ID", validationRules.connectionId);
-    const passwordError = validatePassword(props.meet.password, "Toplantı şifresi");
+    const connectionIdError = validateText(
+      props.meet.conn_id,
+      t("labels.meetingId"),
+      validationRules.connectionId,
+      t,
+    );
+    const passwordError = validatePassword(
+      props.meet.password,
+      t("labels.meetingPassword"),
+      t,
+    );
     if (connectionIdError || passwordError) {
       setError(connectionIdError || passwordError);
       return;
     }
 
     try {
-        const response = await api.post("/joinroom", {
-          conn_id: props.meet.conn_id,
-          password: props.meet.password,
-        });
+      const response = await api.post("/joinroom", {
+        conn_id: props.meet.conn_id,
+        password: props.meet.password,
+      });
 
-        if (response.data === false) {
-          setError("Toplantı id veya şifre yanlış!");
-        } else {
-          const peer = await new Promise((resolve, reject) => {
-            const nextPeer = new Peer();
-            nextPeer.on("open", () => resolve(nextPeer));
-            nextPeer.on("error", reject);
-          });
-          props.setMeetingPeer(peer);
-          props.setMeet(response.data);
-          props.setActiveMenu("meet");
-        }
+      if (response.data === false) {
+        setError(t("join.invalid"));
+      } else {
+        const peer = await new Promise((resolve, reject) => {
+          const nextPeer = new Peer();
+          nextPeer.on("open", () => resolve(nextPeer));
+          nextPeer.on("error", reject);
+        });
+        props.setMeetingPeer(peer);
+        props.setMeet(response.data);
+        props.onMeetingSaved(response.data);
+        props.setActiveMenu("meet");
+      }
     } catch (error) {
-      setError("Toplantıya bağlanılamadı. Lütfen tekrar deneyin.");
+      setError(t("join.failed"));
     }
   };
 
@@ -45,10 +61,10 @@ const Join = (props) => {
           <JoinSvg />
         </div>
         <div>
-          <p className="auth-kicker">Mevcut alan</p>
-          <h1 className="panel-title">Toplantıya katıl</h1>
+          <p className="auth-kicker">{t("join.kicker")}</p>
+          <h1 className="panel-title">{t("join.title")}</h1>
           <p className="panel-description">
-            Toplantı kimliğini ve şifresini girerek görüşmeye devam edin.
+            {t("join.description")}
           </p>
         </div>
       </div>
@@ -56,7 +72,7 @@ const Join = (props) => {
       <form className="meeting-form" onSubmit={joinMeet} noValidate>
         <input
           type="text"
-          placeholder="Toplantı Id"
+          placeholder={t("join.idPlaceholder")}
           className="field-input"
           required
           autoComplete="off"
@@ -72,7 +88,7 @@ const Join = (props) => {
         <br />
         <input
           type="password"
-          placeholder="Toplantı Şifresi"
+          placeholder={t("create.passwordPlaceholder")}
           className="field-input"
           required
           autoComplete="current-password"
@@ -89,11 +105,8 @@ const Join = (props) => {
         <p className="inline-error" role="alert">
           {errorMessage}
         </p>
-        <button
-          className="primary-button"
-          type="submit"
-        >
-          Katıl!
+        <button className="primary-button" type="submit">
+          {t("join.action")}
         </button>
       </form>
     </div>

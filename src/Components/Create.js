@@ -3,14 +3,29 @@ import { api } from "../api";
 import CreateSvg from "../Assets/Illustrates/CreateSvg";
 import Peer from "peerjs";
 import DevicePreview from "./DevicePreview";
-import { validatePassword, validateText, validationRules } from "../formValidation";
+import {
+  validatePassword,
+  validateText,
+  validationRules,
+} from "../formValidation";
+import { useTranslation } from "../i18n";
 const Create = (props) => {
+  const { t } = useTranslation();
   const [errorMessage, setError] = useState("");
 
   const createMeet = async (event) => {
     event.preventDefault();
-    const nameError = validateText(props.meet.name, "Toplantı adı", validationRules.roomName);
-    const passwordError = validatePassword(props.meet.password, "Toplantı şifresi");
+    const nameError = validateText(
+      props.meet.name,
+      t("labels.meetingName"),
+      validationRules.roomName,
+      t,
+    );
+    const passwordError = validatePassword(
+      props.meet.password,
+      t("labels.meetingPassword"),
+      t,
+    );
     if (nameError || passwordError) {
       setError(nameError || passwordError);
       return;
@@ -18,22 +33,23 @@ const Create = (props) => {
 
     try {
       const peer = await new Promise((resolve, reject) => {
-          const nextPeer = new Peer();
-          nextPeer.on("open", () => resolve(nextPeer));
-          nextPeer.on("error", reject);
-        });
-        const response = await api.post("/createroom", {
-          name: props.meet.name,
-          password: props.meet.password,
-          admin_id: props.user.id,
-          conn_id: peer.id,
-        });
+        const nextPeer = new Peer();
+        nextPeer.on("open", () => resolve(nextPeer));
+        nextPeer.on("error", reject);
+      });
+      const response = await api.post("/createroom", {
+        name: props.meet.name,
+        password: props.meet.password,
+        admin_id: props.user.id,
+        conn_id: peer.id,
+      });
 
-        props.setMeetingPeer(peer);
-        props.setMeet(response.data);
-        props.setActiveMenu("meet");
+      props.setMeetingPeer(peer);
+      props.setMeet(response.data);
+      props.onMeetingSaved(response.data);
+      props.setActiveMenu("meet");
     } catch (error) {
-      setError("Toplantı oluşturulamadı. Lütfen tekrar deneyin.");
+      setError(t("create.failed"));
     }
   };
   return (
@@ -43,10 +59,10 @@ const Create = (props) => {
           <CreateSvg />
         </div>
         <div>
-          <p className="auth-kicker">Yeni alan</p>
-          <h1 className="panel-title">Toplantı oluştur</h1>
+          <p className="auth-kicker">{t("create.kicker")}</p>
+          <h1 className="panel-title">{t("create.title")}</h1>
           <p className="panel-description">
-            Katılımcılarınızla paylaşabileceğiniz yeni bir toplantı alanı açın.
+            {t("create.description")}
           </p>
         </div>
       </div>
@@ -54,7 +70,7 @@ const Create = (props) => {
       <form className="meeting-form" onSubmit={createMeet} noValidate>
         <input
           type="text"
-          placeholder="Toplantı Adı"
+          placeholder={t("create.namePlaceholder")}
           className="field-input"
           required
           autoComplete="off"
@@ -67,7 +83,7 @@ const Create = (props) => {
         <br />
         <input
           type="password"
-          placeholder="Toplantı Şifresi"
+          placeholder={t("create.passwordPlaceholder")}
           className="field-input"
           required
           autoComplete="new-password"
@@ -81,11 +97,8 @@ const Create = (props) => {
         <p className="inline-error" role="alert">
           {errorMessage}
         </p>
-        <button
-          className="primary-button"
-          type="submit"
-        >
-          Toplantı oluştur
+        <button className="primary-button" type="submit">
+          {t("create.title")}
         </button>
       </form>
     </div>
