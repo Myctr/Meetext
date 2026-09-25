@@ -1,18 +1,20 @@
 import React from "react";
+import { useTranslation } from "../i18n";
 const Welcome = (props) => {
+  const { t } = useTranslation();
   return (
     <div className="welcome-view">
-      <p className="auth-kicker">Meetext workspace</p>
-      <h1 className="welcome-title">Toplantı alanınız hazır.</h1>
+      <p className="auth-kicker">{t("welcome.kicker")}</p>
+      <h1 className="welcome-title">{t("welcome.title")}</h1>
       <p className="welcome-copy">
-        Yeni bir toplantı oluşturun veya size gönderilen toplantı kimliğiyle mevcut bir görüşmeye katılın.
+        {t("welcome.description")}
       </p>
       <button
         className="primary-button welcome-button"
         type="button"
         onClick={() => props.setActive("create")}
       >
-        Yeni toplantı oluştur
+        {t("welcome.action")}
       </button>
     </div>
   );

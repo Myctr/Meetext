@@ -1,10 +1,12 @@
 import React from "react";
+import { useTranslation } from "../i18n";
 const History = (props) => {
+  const { t } = useTranslation();
   return (
     <div>
       <div className="section-heading">
-        <p className="auth-kicker">Geçmiş</p>
-        <h1 className="panel-title">Toplantılarım</h1>
+        <p className="auth-kicker">{t("history.kicker")}</p>
+        <h1 className="panel-title">{t("history.title")}</h1>
       </div>
       <div className="history-grid">
         {(props.history || []).map((room) => (
@@ -15,11 +17,11 @@ const History = (props) => {
               type="button"
               onClick={(e) => {
                 e.preventDefault();
-                props.setMessageIndex(room.id);
+                props.setMeeting(room);
                 props.setActive("note");
               }}
             >
-              Notlar
+              {t("history.notes")}
             </button>
           </div>
         ))}

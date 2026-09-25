@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "../api";
-import { validatePassword, validateText, validationRules } from "../formValidation";
+import {
+  validatePassword,
+  validateText,
+  validationRules,
+} from "../formValidation";
+import { useTranslation } from "../i18n";
 
 const Profile = ({ user, onUpdated }) => {
+  const { t } = useTranslation();
   const [name, setName] = useState(user.name);
   const [nickname, setNickname] = useState(user.nickname);
   const [password, setPassword] = useState("");
@@ -14,7 +20,7 @@ const Profile = ({ user, onUpdated }) => {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/") || file.size > 500000) {
-      toast.error("500 KB'dan küçük bir görsel seçin.");
+      toast.error(t("profile.imageTooLarge"));
       return;
     }
     const reader = new FileReader();
@@ -24,9 +30,16 @@ const Profile = ({ user, onUpdated }) => {
 
   const saveProfile = async (event) => {
     event.preventDefault();
-    const nameError = validateText(name, "Ad", validationRules.name);
-    const nicknameError = validateText(nickname, "Kullanıcı adı", validationRules.nickname);
-    const passwordError = password ? validatePassword(password, "Yeni şifre") : "";
+    const nameError = validateText(name, t("auth.name"), validationRules.name, t);
+    const nicknameError = validateText(
+      nickname,
+      t("auth.username"),
+      validationRules.nickname,
+      t,
+    );
+    const passwordError = password
+      ? validatePassword(password, t("profile.newPassword"), t)
+      : "";
     const validationError = nameError || nicknameError || passwordError;
     if (validationError) {
       toast.error(validationError);
@@ -42,9 +55,9 @@ const Profile = ({ user, onUpdated }) => {
       });
       onUpdated(response.data);
       setPassword("");
-      toast.success("Profil güncellendi.");
+      toast.success(t("profile.updated"));
     } catch (error) {
-      toast.error("Profil güncellenemedi.");
+      toast.error(t("profile.updateFailed"));
     } finally {
       setSaving(false);
     }
@@ -52,23 +65,23 @@ const Profile = ({ user, onUpdated }) => {
 
   return (
     <div className="profile-view">
-      <p className="auth-kicker">Hesap</p>
-      <h1 className="panel-title">Profilini düzenle</h1>
+      <p className="auth-kicker">{t("profile.kicker")}</p>
+      <h1 className="panel-title">{t("profile.title")}</h1>
       <p className="panel-description">
-        Kişisel bilgilerini ve profil görselini güncel tut.
+        {t("profile.description")}
       </p>
       <form className="profile-form" onSubmit={saveProfile}>
         <label className="avatar-picker">
           {avatar ? (
-            <img src={avatar} alt="Profil önizleme" />
+            <img src={avatar} alt={t("profile.preview")} />
           ) : (
             <span>{name.slice(0, 1).toUpperCase()}</span>
           )}
           <input type="file" accept="image/*" onChange={handleAvatar} />
-          <strong>Profil görseli seç</strong>
+          <strong>{t("profile.chooseImage")}</strong>
         </label>
         <label className="field-label">
-          Ad
+          {t("auth.name")}
           <input
             className="field-input"
             value={name}
@@ -79,7 +92,7 @@ const Profile = ({ user, onUpdated }) => {
           />
         </label>
         <label className="field-label">
-          Kullanıcı adı
+          {t("auth.username")}
           <input
             className="field-input"
             value={nickname}
@@ -90,7 +103,7 @@ const Profile = ({ user, onUpdated }) => {
           />
         </label>
         <label className="field-label">
-          Yeni şifre
+          {t("profile.newPassword")}
           <input
             className="field-input"
             type="password"
@@ -98,11 +111,11 @@ const Profile = ({ user, onUpdated }) => {
             minLength={validationRules.password.minLength}
             maxLength={validationRules.password.maxLength}
             onChange={(event) => setPassword(event.target.value)}
-            placeholder="Değiştirmek istemiyorsanız boş bırakın"
+            placeholder={t("profile.passwordHint")}
           />
         </label>
         <button className="primary-button" type="submit" disabled={saving}>
-          {saving ? "Kaydediliyor..." : "Değişiklikleri kaydet"}
+          {saving ? t("profile.saving") : t("profile.save")}
         </button>
       </form>
     </div>

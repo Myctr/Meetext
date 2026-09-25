@@ -1,11 +1,13 @@
 import React from "react";
+import { useTranslation } from "../i18n";
 
 const Menu = (props) => {
+  const { t } = useTranslation();
   const items = [
-    ["create", "Yeni toplantı"],
-    ["join", "Toplantıya katıl"],
-    ["history", "Toplantılarım"],
-    ["profile", "Profilim"],
+    ["create", t("menu.create")],
+    ["join", t("menu.join")],
+    ["history", t("menu.history")],
+    ["profile", t("menu.profile")],
   ];
 
   return (

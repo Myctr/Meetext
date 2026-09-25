@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useTranslation } from "../i18n";
 
 const DevicePreview = ({ onStreamReady }) => {
+  const { t } = useTranslation();
   const videoRef = useRef(null);
   const onStreamReadyRef = useRef(onStreamReady);
+  const tRef = useRef(t);
   const [stream, setStream] = useState(null);
   const [cameraEnabled, setCameraEnabled] = useState(true);
   const [microphoneEnabled, setMicrophoneEnabled] = useState(true);
@@ -11,6 +14,10 @@ const DevicePreview = ({ onStreamReady }) => {
   useEffect(() => {
     onStreamReadyRef.current = onStreamReady;
   }, [onStreamReady]);
+
+  useEffect(() => {
+    tRef.current = t;
+  }, [t]);
 
   useEffect(() => {
     let active = true;
@@ -22,7 +29,7 @@ const DevicePreview = ({ onStreamReady }) => {
         onStreamReadyRef.current(nextStream);
         if (videoRef.current) videoRef.current.srcObject = nextStream;
       })
-      .catch(() => toast.error("Kamera veya mikrofon izni alınamadı."));
+      .catch(() => toast.error(tRef.current("device.permissionDenied")));
 
     return () => {
       active = false;
@@ -48,13 +55,23 @@ const DevicePreview = ({ onStreamReady }) => {
   return (
     <div className="device-preview">
       <video ref={videoRef} autoPlay muted playsInline />
-      {!cameraEnabled && <div className="video-off-label">Kamera kapalı</div>}
+      {!cameraEnabled && <div className="video-off-label">{t("device.cameraOff")}</div>}
       <div className="device-controls">
-        <button className={cameraEnabled ? "device-button" : "device-button is-off"} type="button" onClick={toggleCamera}>
-          {cameraEnabled ? "Kamerayı kapat" : "Kamerayı aç"}
+        <button
+          className={cameraEnabled ? "device-button" : "device-button is-off"}
+          type="button"
+          onClick={toggleCamera}
+        >
+          {cameraEnabled ? t("device.turnCameraOff") : t("device.turnCameraOn")}
         </button>
-        <button className={microphoneEnabled ? "device-button" : "device-button is-off"} type="button" onClick={toggleMicrophone}>
-          {microphoneEnabled ? "Mikrofonu kapat" : "Mikrofonu aç"}
+        <button
+          className={
+            microphoneEnabled ? "device-button" : "device-button is-off"
+          }
+          type="button"
+          onClick={toggleMicrophone}
+        >
+          {microphoneEnabled ? t("device.turnMicOff") : t("device.turnMicOn")}
         </button>
       </div>
     </div>
