@@ -151,6 +151,10 @@ const createRoom = async (req, res) => {
     const room = await get("SELECT * FROM tbl_rooms WHERE id = ?", [
       result.lastID,
     ]);
+    await run(
+      "INSERT INTO tbl_room_members (room_id, user_id, joined_at) VALUES (?, ?, ?)",
+      [room.id, req.user.id, Date.now()],
+    );
     const roomIds = parseRoomIds(req.user.rooms);
     roomIds.push(result.lastID);
     await run("UPDATE tbl_users SET rooms = ? WHERE id = ?", [
@@ -176,6 +180,10 @@ const joinRoom = async (req, res) => {
       req.user.id,
       room.id,
     ]);
+    await run(
+      "INSERT OR IGNORE INTO tbl_room_members (room_id, user_id, joined_at) VALUES (?, ?, ?)",
+      [room.id, req.user.id, Date.now()],
+    );
     return res.send({ ...room, participant: req.user.id });
   } catch (error) {
     return sendDatabaseError(res, error);
@@ -184,13 +192,13 @@ const joinRoom = async (req, res) => {
 
 const showRooms = async (req, res) => {
   try {
-    const roomIds = parseRoomIds(req.user.rooms);
-    if (roomIds.length === 0) return res.send([]);
-    const placeholders = roomIds.map(() => "?").join(",");
     return res.send(
       await all(
-        `SELECT * FROM tbl_rooms WHERE id IN (${placeholders}) ORDER BY id DESC`,
-        roomIds,
+        `SELECT tbl_rooms.* FROM tbl_rooms
+         INNER JOIN tbl_room_members ON tbl_room_members.room_id = tbl_rooms.id
+         WHERE tbl_room_members.user_id = ?
+         ORDER BY tbl_rooms.id DESC`,
+        [req.user.id],
       ),
     );
   } catch (error) {
@@ -200,11 +208,58 @@ const showRooms = async (req, res) => {
 
 const showMessages = async (req, res) => {
   try {
-    return res.send(
-      await all("SELECT * FROM tbl_messages WHERE room_id = ? ORDER BY id ASC", [
-        req.params.roomId,
-      ]),
+    const room = await get(
+      `SELECT tbl_rooms.id FROM tbl_rooms
+       INNER JOIN tbl_room_members ON tbl_room_members.room_id = tbl_rooms.id
+       WHERE tbl_rooms.id = ? AND tbl_room_members.user_id = ?`,
+      [req.params.roomId, req.user.id],
     );
+    if (!room) return res.status(403).send({ error: "Room access denied" });
+
+    return res.send(
+      await all(
+        `SELECT tbl_messages.id, tbl_messages.message, tbl_messages.created_at,
+                tbl_messages.user_id, tbl_users.name AS sender_name
+         FROM tbl_messages
+         INNER JOIN tbl_users ON tbl_users.id = tbl_messages.user_id
+         WHERE tbl_messages.room_id = ?
+         ORDER BY tbl_messages.created_at ASC, tbl_messages.id ASC`,
+        [req.params.roomId],
+      ),
+    );
+  } catch (error) {
+    return sendDatabaseError(res, error);
+  }
+};
+
+const createMessage = async (req, res) => {
+  const message = req.body.message?.trim();
+  if (!message) return res.status(400).send({ error: "message is required" });
+  if (message.length > 2000) {
+    return res.status(400).send({ error: "message is too long" });
+  }
+
+  try {
+    const room = await get(
+      `SELECT tbl_rooms.id FROM tbl_rooms
+       INNER JOIN tbl_room_members ON tbl_room_members.room_id = tbl_rooms.id
+       WHERE tbl_rooms.id = ? AND tbl_room_members.user_id = ?`,
+      [req.params.roomId, req.user.id],
+    );
+    if (!room) return res.status(403).send({ error: "Room access denied" });
+
+    const createdAt = Date.now();
+    const result = await run(
+      "INSERT INTO tbl_messages (room_id, user_id, message, created_at) VALUES (?, ?, ?, ?)",
+      [room.id, req.user.id, message, createdAt],
+    );
+    return res.status(201).send({
+      id: result.lastID,
+      message,
+      created_at: createdAt,
+      user_id: req.user.id,
+      sender_name: req.user.name,
+    });
   } catch (error) {
     return sendDatabaseError(res, error);
   }
@@ -212,7 +267,9 @@ const showMessages = async (req, res) => {
 
 app.post("/signin", signIn);
 app.post("/signup", createUser);
-app.get("/session", requireSession, (req, res) => res.send(publicUser(req.user)));
+app.get("/session", requireSession, (req, res) =>
+  res.send(publicUser(req.user)),
+);
 app.post("/signout", requireSession, async (req, res) => {
   try {
     await run("DELETE FROM tbl_sessions WHERE token = ?", [req.sessionToken]);
@@ -232,12 +289,16 @@ app.put("/profile", requireSession, async (req, res) => {
   }
 
   try {
-    const passwordHash = password ? await bcrypt.hash(password, 12) : req.user.password;
+    const passwordHash = password
+      ? await bcrypt.hash(password, 12)
+      : req.user.password;
     await run(
       "UPDATE tbl_users SET name = ?, nickname = ?, password = ?, avatar = ? WHERE id = ?",
       [name, nickname, passwordHash, avatar || null, req.user.id],
     );
-    const user = await get("SELECT * FROM tbl_users WHERE id = ?", [req.user.id]);
+    const user = await get("SELECT * FROM tbl_users WHERE id = ?", [
+      req.user.id,
+    ]);
     return res.send(publicUser(user));
   } catch (error) {
     if (error.code === "SQLITE_CONSTRAINT") return res.status(409).send(false);
@@ -249,11 +310,13 @@ app.post("/createroom", requireSession, createRoom);
 app.post("/joinroom", requireSession, joinRoom);
 app.get("/showroms", requireSession, showRooms);
 app.get("/showmsg/:roomId", requireSession, showMessages);
+app.post("/rooms/:roomId/messages", requireSession, createMessage);
 app.get("/tbl_users/:id", requireSession, async (req, res) => {
   try {
-    const user = await get("SELECT id, name, nickname, avatar FROM tbl_users WHERE id = ?", [
-      req.params.id,
-    ]);
+    const user = await get(
+      "SELECT id, name, nickname, avatar FROM tbl_users WHERE id = ?",
+      [req.params.id],
+    );
     return res.send(user || "not found");
   } catch (error) {
     return sendDatabaseError(res, error);

@@ -63,6 +63,15 @@ const initializeDatabase = () => {
       room_id INTEGER NOT NULL,
       user_id INTEGER NOT NULL,
       message TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (room_id) REFERENCES tbl_rooms (id),
+      FOREIGN KEY (user_id) REFERENCES tbl_users (id)
+    )`,
+    `CREATE TABLE IF NOT EXISTS tbl_room_members (
+      room_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      joined_at INTEGER NOT NULL,
+      PRIMARY KEY (room_id, user_id),
       FOREIGN KEY (room_id) REFERENCES tbl_rooms (id),
       FOREIGN KEY (user_id) REFERENCES tbl_users (id)
     )`,
@@ -79,7 +88,32 @@ const initializeDatabase = () => {
       (promise, statement) => promise.then(() => run(statement)),
       Promise.resolve(),
     )
-    .then(() => addColumnIfMissing("tbl_users", "avatar", "TEXT"));
+    .then(() => addColumnIfMissing("tbl_users", "avatar", "TEXT"))
+    .then(() => addColumnIfMissing("tbl_messages", "created_at", "INTEGER"))
+    .then(() =>
+      run("UPDATE tbl_messages SET created_at = ? WHERE created_at IS NULL", [
+        Date.now(),
+      ]),
+    )
+    .then(() =>
+      run(
+        `INSERT OR IGNORE INTO tbl_room_members (room_id, user_id, joined_at)
+         SELECT tbl_rooms.id, tbl_users.id, ?
+         FROM tbl_rooms
+         INNER JOIN tbl_users ON tbl_users.id = tbl_rooms.admin_id`,
+        [Date.now()],
+      ),
+    )
+    .then(() =>
+      run(
+        `INSERT OR IGNORE INTO tbl_room_members (room_id, user_id, joined_at)
+         SELECT tbl_rooms.id, tbl_users.id, ?
+         FROM tbl_rooms
+         INNER JOIN tbl_users ON tbl_users.id = tbl_rooms.participant
+         WHERE tbl_rooms.participant IS NOT NULL AND TRIM(tbl_rooms.participant) <> ''`,
+        [Date.now()],
+      ),
+    );
 };
 
 module.exports = {
