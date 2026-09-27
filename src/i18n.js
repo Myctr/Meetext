@@ -10,6 +10,7 @@ const translations = {
     "nav.switchToLight": "Açık moda geç",
     "nav.switchToDark": "Koyu moda geç",
     "nav.language": "Dil",
+    "nav.profile": "Profil",
     "nav.signOut": "Çıkış yap",
     "intro.kicker": "Eşler arası toplantılar",
     "intro.description": "Görüntülü görüşmeler, yazılı iletişim ve toplantı notları tek bir sakin çalışma alanında.",
@@ -134,7 +135,7 @@ const translations = {
   },
   en: {
     "app.loading": "Meetext is loading...",
-    "nav.lightMode": "Light mode", "nav.darkMode": "Dark mode", "nav.switchToLight": "Switch to light mode", "nav.switchToDark": "Switch to dark mode", "nav.language": "Language", "nav.signOut": "Sign out",
+    "nav.lightMode": "Light mode", "nav.darkMode": "Dark mode", "nav.switchToLight": "Switch to light mode", "nav.switchToDark": "Switch to dark mode", "nav.language": "Language", "nav.profile": "Profile", "nav.signOut": "Sign out",
     "intro.kicker": "Peer-to-peer meetings", "intro.description": "Video calls, written communication, and meeting notes in one calm workspace.",
     "auth.signIn": "Sign in", "auth.signInDescription": "Sign in to continue to your meeting workspace.", "auth.username": "Username", "auth.usernamePlaceholder": "Your username", "auth.password": "Password", "auth.passwordPlaceholder": "Your password", "auth.noAccount": "Don't have an account?", "auth.register": "Register", "auth.createAccount": "Create an account", "auth.registerDescription": "Create an account to join your meetings quickly.", "auth.name": "Name", "auth.namePlaceholder": "Your name", "auth.haveAccount": "Already have an account?", "auth.signInLink": "Sign in",
     "auth.invalidCredentials": "Username or password is incorrect.", "auth.requiredCredentials": "Username and password are required.", "auth.signInSuccess": "Signed in. Redirecting to your workspace.", "auth.signInFailed": "Could not sign in. Please try again.", "auth.registerSuccess": "Registered successfully. Redirecting to your workspace.", "auth.usernameTaken": "This username is already in use.", "auth.registerFailed": "Could not register. Please try again.",
