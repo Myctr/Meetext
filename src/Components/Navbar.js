@@ -71,7 +71,11 @@ const Navbar = (props) => {
             aria-label={t("nav.profile")}
             title={props.user.name}
           >
-            <span className="avatar-initial">{props.user.name.charAt(0).toUpperCase()}</span>
+            {props.user.avatar ? (
+              <img className="avatar-image" src={props.user.avatar} alt="" />
+            ) : (
+              <span className="avatar-initial">{props.user.name.charAt(0).toUpperCase()}</span>
+            )}
           </button>
           <button
             className="icon-button signout-button"
