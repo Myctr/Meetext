@@ -1,8 +1,15 @@
 import React, { useEffect, useRef } from "react";
-import avatar from "../Assets/Image/avatar.png";
 import { useTranslation } from "../i18n";
 
-const ParticipantMedia = ({ name, stream, muted = false }) => {
+const getInitials = (name) =>
+  name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+
+const ParticipantMedia = ({ avatar, name, stream, muted = false }) => {
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -13,10 +20,10 @@ const ParticipantMedia = ({ name, stream, muted = false }) => {
     <div className={`participant-media ${stream ? "has-video" : "has-avatar"}`}>
       {stream ? (
         <video ref={videoRef} autoPlay muted={muted} playsInline />
-      ) : (
+      ) : avatar ? (
         <img src={avatar} alt="" />
-      )}
-      {!stream && <span>{name.slice(0, 1).toUpperCase()}</span>}
+      ) : null}
+      {!stream && !avatar && <span>{getInitials(name)}</span>}
     </div>
   );
 };
@@ -55,6 +62,7 @@ const Participants = ({
           return (
             <div className="participant-card" key={participant.id}>
               <ParticipantMedia
+                avatar={participant.avatar}
                 muted={isCurrentUser}
                 name={participant.name}
                 stream={stream}

@@ -28,7 +28,7 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
   );
   const [messages, setMessages] = useState([]);
   const [participants, setParticipants] = useState([
-    { id: user.id, name: user.name },
+    { id: user.id, name: user.name, avatar: user.avatar },
   ]);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [messageText, setMessageText] = useState("");
@@ -136,7 +136,7 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
           setConnectionStatus("meeting.awaitingApproval");
           connection.send({
             type: "join_request",
-            user: { id: user.id, name: user.name },
+            user: { id: user.id, name: user.name, avatar: user.avatar },
           });
         }
       });
@@ -223,7 +223,7 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
       if (activeConnection?.open) {
         activeConnection.send({
           type: isHost ? "host_left" : "leave",
-          user: { id: user.id, name: user.name },
+          user: { id: user.id, name: user.name, avatar: user.avatar },
         });
       }
       window.setTimeout(() => activeConnection?.close(), 150);
@@ -231,7 +231,16 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
       pendingConnections.clear();
       connectionRef.current = null;
     };
-  }, [isHost, localStream, meet.conn_id, meetingPeer, t, user.id, user.name]);
+  }, [
+    isHost,
+    localStream,
+    meet.conn_id,
+    meetingPeer,
+    t,
+    user.avatar,
+    user.id,
+    user.name,
+  ]);
 
   const toggleTrack = (kind) => {
     const nextEnabled = kind === "video" ? !cameraEnabled : !microphoneEnabled;
