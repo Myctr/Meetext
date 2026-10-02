@@ -1046,7 +1046,8 @@
 
 .participant-media-controls {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
   margin-top: 0.8rem;
   padding: 0;
   border-top: 0;
@@ -1054,8 +1055,13 @@
 
 .participant-media-controls .device-button {
   min-width: 0;
-  padding: 0 0.35rem;
-  font-size: 0.7rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.45rem 0.35rem;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .participants-title {
