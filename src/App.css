@@ -250,6 +250,10 @@
 }
 
 .theme-toggle-thumb svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -6.5px;
   width: 13px;
   height: 13px;
   transition: opacity 200ms ease, transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -395,6 +399,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-left: 0.75rem;
 }
 
 .icon-button {
@@ -430,6 +435,8 @@
 }
 
 .avatar-button {
+  box-sizing: border-box;
+  padding: 0;
   overflow: hidden;
   border-color: transparent;
   background: linear-gradient(135deg, var(--accent), var(--accent-dark));
