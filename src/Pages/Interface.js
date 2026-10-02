@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import Menu from "../Components/Menu";
 import Create from "../Components/Create";
@@ -10,9 +11,23 @@ import Note from "../Components/Note";
 import Profile from "../Components/Profile";
 import { useTranslation } from "../i18n";
 
+const getMenuFromPath = (pathname) => {
+  if (pathname.startsWith("/create")) return "create";
+  if (pathname.startsWith("/join")) return "join";
+  if (pathname.startsWith("/history/") && pathname.endsWith("/notes")) return "note";
+  if (pathname.startsWith("/history")) return "history";
+  if (pathname.startsWith("/profile")) return "profile";
+  if (pathname.startsWith("/meeting")) return "meet";
+  return undefined;
+};
+
 const Interface = (props) => {
   const { t } = useTranslation();
-  const [activeMenu, setActiveMenu] = useState();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [activeMenu, setActiveMenu] = useState(() =>
+    getMenuFromPath(location.pathname),
+  );
   const [meet, setMeet] = useState({
     id: "",
     name: "",
@@ -42,7 +57,15 @@ const Interface = (props) => {
       return;
     }
     setActiveMenu(nextMenu);
+    if (nextMenu === "note" && selectedMeeting?.id) {
+      navigate(`/history/${selectedMeeting.id}/notes`);
+      return;
+    }
+    navigate(nextMenu === "meet" ? "/meeting" : `/${nextMenu}`);
   };
+  useEffect(() => {
+    setActiveMenu(getMenuFromPath(location.pathname));
+  }, [location.pathname]);
   useEffect(() => {
     api.get("/showroms").then((res) => {
       setHistory(res.data);
@@ -73,7 +96,7 @@ const Interface = (props) => {
                     setMeet={setMeet}
                     setMeetingPeer={setMeetingPeer}
                     setLocalStream={setLocalStream}
-                    setActiveMenu={setActiveMenu}
+                    setActiveMenu={changeMenu}
                     onMeetingSaved={addToHistory}
                   />
                 );
@@ -85,7 +108,7 @@ const Interface = (props) => {
                     setMeet={setMeet}
                     setMeetingPeer={setMeetingPeer}
                     setLocalStream={setLocalStream}
-                    setActiveMenu={setActiveMenu}
+                    setActiveMenu={changeMenu}
                     onMeetingSaved={addToHistory}
                   />
                 );
@@ -95,7 +118,7 @@ const Interface = (props) => {
                     history={history}
                     user={props.user}
                     setMeeting={setSelectedMeeting}
-                    setActive={setActiveMenu}
+                    setActive={changeMenu}
                   />
                 );
               case "note":
@@ -114,7 +137,7 @@ const Interface = (props) => {
                   />
                 );
               default:
-                return <Welcome setActive={setActiveMenu} />;
+                return <Welcome setActive={changeMenu} />;
             }
           })()}
         </div>
