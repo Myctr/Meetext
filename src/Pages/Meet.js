@@ -21,6 +21,31 @@ const formatMessageTime = (timestamp, language) =>
     minute: "2-digit",
   }).format(new Date(timestamp));
 
+const MAX_ATTACHMENTS = 3;
+const MAX_ATTACHMENT_SIZE = 2 * 1024 * 1024;
+const ALLOWED_ATTACHMENT_TYPES = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "text/plain",
+  "text/csv",
+]);
+
+const isSupportedAttachment = (file) =>
+  file.type.startsWith("image/") || ALLOWED_ATTACHMENT_TYPES.has(file.type);
+
+const readFileAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("File could not be read"));
+    reader.readAsDataURL(file);
+  });
+
 const Meet = ({ meet, meetingPeer, user, localStream }) => {
   const { language, t } = useTranslation();
   const [connectionStatus, setConnectionStatus] = useState(
@@ -32,6 +57,7 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
   ]);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [messageText, setMessageText] = useState("");
+  const [attachments, setAttachments] = useState([]);
   const [copied, setCopied] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [remoteStreams, setRemoteStreams] = useState([]);
@@ -254,19 +280,65 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
     else setMicrophoneEnabled(nextEnabled);
   };
 
+  const handleAttachmentChange = async (event) => {
+    const files = Array.from(event.target.files || []);
+    event.target.value = "";
+    if (!files.length) return;
+    if (attachments.length + files.length > MAX_ATTACHMENTS) {
+      toast.error(t("meeting.attachmentCountLimit"));
+      return;
+    }
+    const invalidFile = files.find(
+      (file) => file.size > MAX_ATTACHMENT_SIZE || !isSupportedAttachment(file),
+    );
+    if (invalidFile) {
+      toast.error(
+        invalidFile.size > MAX_ATTACHMENT_SIZE
+          ? t("meeting.attachmentSizeLimit")
+          : t("meeting.attachmentTypeLimit"),
+      );
+      return;
+    }
+    try {
+      const loadedFiles = await Promise.all(
+        files.map(async (file) => ({
+          id: `${file.name}-${file.lastModified}-${file.size}`,
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          data: await readFileAsDataUrl(file),
+        })),
+      );
+      setAttachments((currentAttachments) => [
+        ...currentAttachments,
+        ...loadedFiles,
+      ]);
+    } catch (error) {
+      toast.error(t("meeting.attachmentReadFailed"));
+    }
+  };
+
   const sendMessage = () => {
     const trimmedMessage = messageText.trim();
     const connection = connectionRef.current;
-    if (!trimmedMessage || !connection || !connection.open) return;
+    if (
+      (!trimmedMessage && attachments.length === 0) ||
+      !connection ||
+      !connection.open
+    ) {
+      return;
+    }
     const message = {
       type: "message",
       sender: { id: user.id, name: user.name },
       text: trimmedMessage,
+      attachments,
       sentAt: Date.now(),
     };
     connection.send(message);
     setMessages((currentMessages) => [...currentMessages, message]);
     setMessageText("");
+    setAttachments([]);
     api.post(`/rooms/${meet.id}/messages`, { message: trimmedMessage }).catch(() => {
       toast.error(t("meeting.recordFailed"));
     });
@@ -342,7 +414,30 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
                 key={`${message.sender.id}-${index}`}
               >
                 <span className="chat-sender">{message.sender.name}</span>
-                <span>{message.text}</span>
+                {message.text && <span>{message.text}</span>}
+                {message.attachments?.map((attachment) => (
+                  <a
+                    className="chat-attachment"
+                    href={attachment.data}
+                    key={attachment.id || attachment.name}
+                    download={attachment.name}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {attachment.type?.startsWith("image/") ? (
+                      <img
+                        className="chat-attachment-image"
+                        src={attachment.data}
+                        alt={attachment.name}
+                      />
+                    ) : (
+                      <span className="chat-attachment-file">
+                        <strong>{attachment.name}</strong>
+                        <small>{Math.ceil(attachment.size / 1024)} KB</small>
+                      </span>
+                    )}
+                  </a>
+                ))}
                 <time
                   className="chat-time"
                   dateTime={new Date(message.sentAt).toISOString()}
@@ -353,6 +448,39 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
             ))}
           </div>
           <div className="meeting-message-box">
+            <div className="chat-composer-attachments">
+              {attachments.map((attachment) => (
+                <button
+                  className="chat-attachment-chip"
+                  key={attachment.id}
+                  type="button"
+                  onClick={() =>
+                    setAttachments((currentAttachments) =>
+                      currentAttachments.filter((current) => current.id !== attachment.id),
+                    )
+                  }
+                  title={t("meeting.removeAttachment")}
+                >
+                  {attachment.name}
+                </button>
+              ))}
+            </div>
+            <input
+              id="meeting-attachments"
+              type="file"
+              className="visually-hidden"
+              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
+              multiple
+              onChange={handleAttachmentChange}
+              disabled={connectionStatus !== "meeting.connected"}
+            />
+            <label
+              className="secondary-button attachment-button"
+              htmlFor="meeting-attachments"
+              title={t("meeting.attachmentLimits")}
+            >
+              {t("meeting.attachFile")}
+            </label>
             <input
               type="text"
               className="field-input"
