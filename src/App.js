@@ -1,24 +1,47 @@
 import React, { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 import { api, restoreSessionToken, setSessionToken } from "./api";
 import Navbar from "./Components/Navbar";
 import Login from "./Pages/Login";
 import Interface from "./Pages/Interface";
+import Create from "./Components/Create";
+import Join from "./Components/Join";
+import History from "./Components/History";
+import Meet from "./Pages/Meet";
+import Welcome from "./Components/Welcome";
+import Note from "./Components/Note";
+import Profile from "./Components/Profile";
 import { Toaster } from "react-hot-toast";
-import { useTranslation } from "./i18n";
 
 const THEME_KEY = "meetext_theme";
 
 const getInitialTheme = () => {
   const savedTheme = localStorage.getItem(THEME_KEY);
   if (savedTheme === "light" || savedTheme === "dark") return savedTheme;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
+  const prefersDark =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+  return prefersDark
     ? "dark"
     : "light";
 };
 
+const ProtectedRoute = ({ children, user, loadingSession }) => {
+  if (loadingSession) {
+    return <div className="session-loading">Loading...</div>;
+  }
+  return user ? children : <Navigate to="/login" replace />;
+};
+
+const PublicRoute = ({ children, user, loadingSession }) => {
+  if (loadingSession) {
+    return <div className="session-loading">Loading...</div>;
+  }
+  return user ? <Navigate to="/" replace /> : children;
+};
+
 function App() {
-  const { t } = useTranslation();
   const [user, setUser] = useState();
   const [loadingSession, setLoadingSession] = useState(true);
   const [theme, setTheme] = useState(getInitialTheme);
@@ -32,14 +55,13 @@ function App() {
     const token = restoreSessionToken();
     if (!token) {
       setLoadingSession(false);
-      return undefined;
+      return;
     }
     api
       .get("/session")
       .then((response) => setUser(response.data))
       .catch(() => setSessionToken(null))
       .finally(() => setLoadingSession(false));
-    return undefined;
   }, []);
 
   const handleAuthenticated = ({ user: authenticatedUser, token }) => {
@@ -54,7 +76,7 @@ function App() {
       // Clear local state when the server cannot be reached.
     }
     setSessionToken(null);
-      setUser(undefined);
+    setUser(undefined);
   };
 
   const toggleTheme = () => {
@@ -63,38 +85,67 @@ function App() {
     );
   };
 
-  if (loadingSession)
-    return <div className="session-loading">{t("app.loading")}</div>;
-
   return (
-    <div className="app-shell">
-      <Navbar
-        login={Boolean(user)}
-        user={user}
-        signOut={handleSignOut}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-      />
-      <main className="app-content">
-        {user ? (
-          <Interface user={user} onUserUpdated={setUser} />
-        ) : (
-          <Login onAuthenticated={handleAuthenticated} />
-        )}
-      </main>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 3500,
-          style: {
-            borderRadius: "12px",
-            fontFamily: "inherit",
-            background: "var(--toast-surface)",
-            color: "var(--ink)",
-          },
-        }}
-      />
-    </div>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
+      <div className="app-shell">
+        <Navbar
+          login={Boolean(user)}
+          user={user}
+          signOut={handleSignOut}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+        />
+        <main className="app-content">
+          <Routes>
+            <Route
+              path="/login"
+              element={
+                <PublicRoute user={user} loadingSession={loadingSession}>
+                  <Login onAuthenticated={handleAuthenticated} />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/*"
+              element={
+                <ProtectedRoute user={user} loadingSession={loadingSession}>
+                  <Interface
+                    user={user}
+                    onUserUpdated={setUser}
+                    handleAuthenticated={handleAuthenticated}
+                  />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Welcome />} />
+              <Route path="create" element={<Create user={user} />} />
+              <Route path="join" element={<Join user={user} />} />
+              <Route path="history" element={<History user={user} />} />
+              <Route path="history/:id/notes" element={<Note />} />
+              <Route path="profile" element={<Profile user={user} onUpdated={setUser} />} />
+              <Route path="meeting/:id" element={<Meet user={user} />} />
+            </Route>
+          </Routes>
+        </main>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3500,
+            style: {
+              borderRadius: "12px",
+              fontFamily: "inherit",
+              background: "var(--toast-surface)",
+              color: "var(--ink)",
+            },
+          }}
+        />
+      </div>
+    </BrowserRouter>
   );
 }
 
