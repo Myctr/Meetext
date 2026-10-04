@@ -22,9 +22,7 @@ const getInitialTheme = () => {
   const prefersDark =
     typeof window.matchMedia === "function" &&
     window.matchMedia("(prefers-color-scheme: dark)").matches;
-  return prefersDark
-    ? "dark"
-    : "light";
+  return prefersDark ? "dark" : "light";
 };
 
 const ProtectedRoute = ({ children, user, loadingSession }) => {
@@ -80,9 +78,7 @@ function App() {
   };
 
   const toggleTheme = () => {
-    setTheme((currentTheme) =>
-      currentTheme === "dark" ? "light" : "dark",
-    );
+    setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"));
   };
 
   return (
@@ -127,7 +123,10 @@ function App() {
               <Route path="join" element={<Join user={user} />} />
               <Route path="history" element={<History user={user} />} />
               <Route path="history/:id/notes" element={<Note />} />
-              <Route path="profile" element={<Profile user={user} onUpdated={setUser} />} />
+              <Route
+                path="profile"
+                element={<Profile user={user} onUpdated={setUser} />}
+              />
               <Route path="meeting/:id" element={<Meet user={user} />} />
             </Route>
           </Routes>
