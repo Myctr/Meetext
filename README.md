@@ -75,7 +75,3 @@ The API runs on port `3001` by default. The server supports these environment va
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
-
-## Demo
-
-Project demo: https://youtu.be/4kUVXV6Tc-0
