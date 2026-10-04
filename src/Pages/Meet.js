@@ -48,9 +48,7 @@ const readFileAsDataUrl = (file) =>
 
 const Meet = ({ meet, meetingPeer, user, localStream }) => {
   const { language, t } = useTranslation();
-  const [connectionStatus, setConnectionStatus] = useState(
-    "meeting.preparing",
-  );
+  const [connectionStatus, setConnectionStatus] = useState("meeting.preparing");
   const [messages, setMessages] = useState([]);
   const [participants, setParticipants] = useState([
     { id: user.id, name: user.name, avatar: user.avatar },
@@ -339,9 +337,11 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
     setMessages((currentMessages) => [...currentMessages, message]);
     setMessageText("");
     setAttachments([]);
-    api.post(`/rooms/${meet.id}/messages`, { message: trimmedMessage }).catch(() => {
-      toast.error(t("meeting.recordFailed"));
-    });
+    api
+      .post(`/rooms/${meet.id}/messages`, { message: trimmedMessage })
+      .catch(() => {
+        toast.error(t("meeting.recordFailed"));
+      });
   };
 
   const copyMeetingId = async () => {
@@ -369,7 +369,9 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
           </div>
         </div>
         <div className="meeting-id">
-          <span>{t("meeting.id")}: {meet.conn_id}</span>
+          <span>
+            {t("meeting.id")}: {meet.conn_id}
+          </span>
           <button className="copy-button" type="button" onClick={copyMeetingId}>
             {copied ? t("meeting.copied") : t("meeting.copy")}
           </button>
@@ -456,7 +458,9 @@ const Meet = ({ meet, meetingPeer, user, localStream }) => {
                   type="button"
                   onClick={() =>
                     setAttachments((currentAttachments) =>
-                      currentAttachments.filter((current) => current.id !== attachment.id),
+                      currentAttachments.filter(
+                        (current) => current.id !== attachment.id,
+                      ),
                     )
                   }
                   title={t("meeting.removeAttachment")}
