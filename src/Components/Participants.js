@@ -68,7 +68,9 @@ const Participants = ({
                 stream={stream}
               />
               <div className="participant-details">
-                <strong>{isCurrentUser ? t("participants.you") : participant.name}</strong>
+                <strong>
+                  {isCurrentUser ? t("participants.you") : participant.name}
+                </strong>
                 <span>
                   {isCurrentUser
                     ? cameraEnabled
@@ -79,7 +81,10 @@ const Participants = ({
                       : t("participants.audioOnly")}
                 </span>
               </div>
-              <span className="participant-state" aria-label={t("participants.connected")} />
+              <span
+                className="participant-state"
+                aria-label={t("participants.connected")}
+              />
             </div>
           );
         })}
@@ -90,7 +95,9 @@ const Participants = ({
           type="button"
           onClick={onToggleCamera}
         >
-          {cameraEnabled ? t("participants.turnCameraOff") : t("participants.turnCameraOn")}
+          {cameraEnabled
+            ? t("participants.turnCameraOff")
+            : t("participants.turnCameraOn")}
         </button>
         <button
           className={
@@ -99,7 +106,9 @@ const Participants = ({
           type="button"
           onClick={onToggleMicrophone}
         >
-          {microphoneEnabled ? t("participants.turnMicOff") : t("participants.turnMicOn")}
+          {microphoneEnabled
+            ? t("participants.turnMicOff")
+            : t("participants.turnMicOn")}
         </button>
       </div>
     </aside>

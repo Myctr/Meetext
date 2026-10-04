@@ -14,7 +14,8 @@ import { useTranslation } from "../i18n";
 const getMenuFromPath = (pathname) => {
   if (pathname.startsWith("/create")) return "create";
   if (pathname.startsWith("/join")) return "join";
-  if (pathname.startsWith("/history/") && pathname.endsWith("/notes")) return "note";
+  if (pathname.startsWith("/history/") && pathname.endsWith("/notes"))
+    return "note";
   if (pathname.startsWith("/history")) return "history";
   if (pathname.startsWith("/profile")) return "profile";
   if (pathname.startsWith("/meeting")) return "meet";
