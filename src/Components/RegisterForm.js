@@ -16,7 +16,12 @@ const RegisterForm = (props) => {
   const [message, setMessage] = useState("");
   const registerHandler = async (event) => {
     event.preventDefault();
-    const nameError = validateText(name, t("auth.name"), validationRules.name, t);
+    const nameError = validateText(
+      name,
+      t("auth.name"),
+      validationRules.name,
+      t,
+    );
     const usernameError = validateText(
       username,
       t("auth.username"),
@@ -53,9 +58,7 @@ const RegisterForm = (props) => {
   return (
     <div>
       <h2 className="form-title">{t("auth.createAccount")}</h2>
-      <p className="form-description">
-        {t("auth.registerDescription")}
-      </p>
+      <p className="form-description">{t("auth.registerDescription")}</p>
       <form className="auth-form" onSubmit={registerHandler} noValidate>
         <label className="field-label">
           {t("auth.name")}
@@ -100,7 +103,7 @@ const RegisterForm = (props) => {
           {t("auth.register")}
         </button>
         <p className="form-switch">
-          {t("auth.haveAccount")} {" "}
+          {t("auth.haveAccount")}{" "}
           <button
             className="text-button"
             type="button"

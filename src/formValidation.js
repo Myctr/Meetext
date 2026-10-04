@@ -22,10 +22,16 @@ export const validateText = (value, label, rule, t) => {
 export const validatePassword = (value, label, t) => {
   if (!value) return t("validation.required", { label });
   if (value.length < validationRules.password.minLength) {
-    return t("validation.min", { label, count: validationRules.password.minLength });
+    return t("validation.min", {
+      label,
+      count: validationRules.password.minLength,
+    });
   }
   if (value.length > validationRules.password.maxLength) {
-    return t("validation.max", { label, count: validationRules.password.maxLength });
+    return t("validation.max", {
+      label,
+      count: validationRules.password.maxLength,
+    });
   }
   return "";
 };

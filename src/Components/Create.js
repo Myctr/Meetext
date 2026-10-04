@@ -61,9 +61,7 @@ const Create = (props) => {
         <div>
           <p className="auth-kicker">{t("create.kicker")}</p>
           <h1 className="panel-title">{t("create.title")}</h1>
-          <p className="panel-description">
-            {t("create.description")}
-          </p>
+          <p className="panel-description">{t("create.description")}</p>
         </div>
       </div>
       <DevicePreview onStreamReady={props.setLocalStream} />

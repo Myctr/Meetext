@@ -50,9 +50,7 @@ const LoginForm = (props) => {
   return (
     <div>
       <h2 className="form-title">{t("auth.signIn")}</h2>
-      <p className="form-description">
-        {t("auth.signInDescription")}
-      </p>
+      <p className="form-description">{t("auth.signInDescription")}</p>
       <form className="auth-form" onSubmit={signInHandler} noValidate>
         <label className="field-label">
           {t("auth.username")}
@@ -87,7 +85,7 @@ const LoginForm = (props) => {
           {t("auth.signIn")}
         </button>
         <p className="form-switch">
-          {t("auth.noAccount")} {" "}
+          {t("auth.noAccount")}{" "}
           <button
             className="text-button"
             type="button"

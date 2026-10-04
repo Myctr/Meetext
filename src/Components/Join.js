@@ -63,9 +63,7 @@ const Join = (props) => {
         <div>
           <p className="auth-kicker">{t("join.kicker")}</p>
           <h1 className="panel-title">{t("join.title")}</h1>
-          <p className="panel-description">
-            {t("join.description")}
-          </p>
+          <p className="panel-description">{t("join.description")}</p>
         </div>
       </div>
       <DevicePreview onStreamReady={props.setLocalStream} />

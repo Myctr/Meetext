@@ -30,7 +30,12 @@ const Profile = ({ user, onUpdated }) => {
 
   const saveProfile = async (event) => {
     event.preventDefault();
-    const nameError = validateText(name, t("auth.name"), validationRules.name, t);
+    const nameError = validateText(
+      name,
+      t("auth.name"),
+      validationRules.name,
+      t,
+    );
     const nicknameError = validateText(
       nickname,
       t("auth.username"),
@@ -67,9 +72,7 @@ const Profile = ({ user, onUpdated }) => {
     <div className="profile-view">
       <p className="auth-kicker">{t("profile.kicker")}</p>
       <h1 className="panel-title">{t("profile.title")}</h1>
-      <p className="panel-description">
-        {t("profile.description")}
-      </p>
+      <p className="panel-description">{t("profile.description")}</p>
       <form className="profile-form" onSubmit={saveProfile}>
         <label className="avatar-picker">
           {avatar ? (
