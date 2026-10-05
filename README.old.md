@@ -1,2 +1,0 @@
-# Meetext
-My Graduation Project
