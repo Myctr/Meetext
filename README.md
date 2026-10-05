@@ -58,20 +58,6 @@ The API runs on port `3001` by default. The server supports these environment va
 - `CORS_ORIGINS`: comma-separated frontend origins
 - `MEETEXT_DB_PATH`: optional path for the SQLite database
 
-## GitHub Metadata Suggestions
-
-### Recommended project name
-
-`Meetext`
-
-### Recommended description
-
-`A privacy-focused peer-to-peer meeting workspace with video calls, live chat, profiles, and SQLite-backed meeting history.`
-
-### Recommended topics
-
-`react`, `express`, `sqlite`, `peerjs`, `webrtc`, `video-conferencing`, `peer-to-peer`, `real-time-chat`, `meeting-app`, `javascript`
-
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
